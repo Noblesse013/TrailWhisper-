@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Shadows Into Light', cursive;
+  }
+  body{
+    background-color: beige;
+    overflow: hidden;
+  }
+}
