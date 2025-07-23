@@ -10,7 +10,28 @@ const path = require("path");
 
 const { authenticateToken } = require("./utilities");
 
-mongoose.connect(process.env.connectionString);
+// MongoDB connection with proper error handling
+mongoose.connect(process.env.connectionString)
+  .then(() => {
+    console.log("✅ Connected to MongoDB successfully");
+  })
+  .catch((error) => {
+    console.error("❌ MongoDB connection error:", error.message);
+    process.exit(1);
+  });
+
+// MongoDB connection event listeners
+mongoose.connection.on('connected', () => {
+  console.log('🔗 Mongoose connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('📤 Mongoose disconnected');
+});
 
 const User = require("./models/user.model");
 const TravelStory = require("./models/travelStory.model");
