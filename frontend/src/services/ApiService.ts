@@ -1,0 +1,190 @@
+// API Service for connecting to TrailWhisper backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+export interface TravelStory {
+  _id: string;
+  title: string;
+  story: string;
+  visitedLocation: string;
+  imageUrl?: string;
+  visitedDate: Date;
+  userId: string;
+  isFavourite: boolean;
+  createdOn: Date;
+}
+
+export interface User {
+  _id: string;
+  fullName: string;
+  email: string;
+}
+
+export interface AuthResponse {
+  error: boolean;
+  message: string;
+  user?: User;
+  accessToken?: string;
+}
+
+export interface ApiResponse<T = any> {
+  error: boolean;
+  message: string;
+  story?: T;
+  stories?: T[];
+  user?: User;
+}
+
+class ApiService {
+  private getAuthHeaders(): HeadersInit {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    };
+  }
+
+  private async handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'An error occurred');
+    }
+    return response.json();
+  }
+
+  // Auth endpoints
+  async createAccount(fullName: string, email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/create-account`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName, email, password }),
+    });
+    return this.handleResponse<AuthResponse>(response);
+  }
+
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    return this.handleResponse<AuthResponse>(response);
+  }
+
+  async getUser(): Promise<{ user: User }> {
+    const response = await fetch(`${API_BASE_URL}/get-user`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ user: User }>(response);
+  }
+
+  // Travel Story endpoints
+  async addTravelStory(storyData: {
+    title: string;
+    story: string;
+    visitedLocation: string;
+    imageUrl?: string;
+    visitedDate: string; // Date in milliseconds as string
+  }): Promise<ApiResponse<TravelStory>> {
+    const response = await fetch(`${API_BASE_URL}/add-travel-story`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(storyData),
+    });
+    return this.handleResponse<ApiResponse<TravelStory>>(response);
+  }
+
+  async getAllStories(): Promise<{ stories: TravelStory[] }> {
+    const response = await fetch(`${API_BASE_URL}/get-all-stories`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ stories: TravelStory[] }>(response);
+  }
+
+  async editStory(id: string, storyData: {
+    title: string;
+    story: string;
+    visitedLocation: string;
+    imageUrl?: string;
+    visitedDate: string;
+  }): Promise<ApiResponse<TravelStory>> {
+    const response = await fetch(`${API_BASE_URL}/edit-story/${id}`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(storyData),
+    });
+    return this.handleResponse<ApiResponse<TravelStory>>(response);
+  }
+
+  async deleteStory(id: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/delete-story/${id}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  async updateIsFavourite(id: string, isFavourite: boolean): Promise<ApiResponse<TravelStory>> {
+    const response = await fetch(`${API_BASE_URL}/update-is-favourite/${id}`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ isFavourite }),
+    });
+    return this.handleResponse<ApiResponse<TravelStory>>(response);
+  }
+
+  async searchStories(query: string): Promise<{ stories: TravelStory[] }> {
+    const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(query)}`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ stories: TravelStory[] }>(response);
+  }
+
+  async filterStories(startDate: Date, endDate: Date): Promise<{ stories: TravelStory[] }> {
+    const start = startDate.getTime();
+    const end = endDate.getTime();
+    
+    const response = await fetch(`${API_BASE_URL}/travel-stories/filter?startDate=${start}&endDate=${end}`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ stories: TravelStory[] }>(response);
+  }
+
+  // Image upload endpoints
+  async uploadImage(imageBase64: string): Promise<{ imageUrl: string; publicId: string }> {
+    const response = await fetch(`${API_BASE_URL}/image-upload`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ image: imageBase64 }),
+    });
+    return this.handleResponse<{ imageUrl: string; publicId: string }>(response);
+  }
+
+  async deleteImage(publicId: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/delete-image`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ publicId }),
+    });
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  // Authentication helpers
+  saveToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  removeToken(): void {
+    localStorage.removeItem('token');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+}
+
+export const apiService = new ApiService();
+export default apiService;

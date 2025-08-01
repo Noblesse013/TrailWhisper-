@@ -42,11 +42,12 @@ const app = express();
 app.use(express.json({ limit: "50mb" }));  // Increase JSON body size limit
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-app.use(cors({
-    origin: "http://localhost:5173",  // Allow frontend
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cors()); // Allow all origins for development
+
+// Test endpoint to verify CORS
+app.get("/test", (req, res) => {
+    res.json({ message: "CORS is working!", timestamp: new Date().toISOString() });
+});
 
 // create account
 app.post("/create-account", async (req, res) => {
@@ -84,7 +85,7 @@ app.post("/create-account", async (req, res) => {
 
     return res.status(201).json({
         error: false,
-        user: { fullName: user.fullName, email: user.email },
+        user: { _id: user._id, fullName: user.fullName, email: user.email },
         accessToken,
         message: "Registration Successful",
     });
@@ -120,7 +121,7 @@ app.post("/login", async (req, res) => {
     return res.json({
         error: false,
         message: "Login Successful",
-        user: { fullName: user.fullName, email: user.email },
+        user: { _id: user._id, fullName: user.fullName, email: user.email },
         accessToken,
     });
 });
@@ -135,7 +136,7 @@ app.get("/get-user",authenticateToken, async (req, res) => {
     }
 
     return res.json({
-        user: isUser,
+        user: { _id: isUser._id, fullName: isUser.fullName, email: isUser.email },
         message: "",
     });
 
@@ -145,15 +146,17 @@ app.get("/get-user",authenticateToken, async (req, res) => {
 app.post("/add-travel-story",authenticateToken, async (req, res) => {
     const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
     const { userId } = req.user
-    console.log("📩 Received Data:", req.body); // ✅ Debug log
+    console.log("📩 Received Story Data:", { title, story, visitedLocation, imageUrl, visitedDate, userId }); // Enhanced debug log
     
     // Validate required fields
-    if(!title || !story || !visitedLocation || !imageUrl || !visitedDate){
-        return res.status(400).json({error: true, message: "All fields are required"})
+    if(!title || !story || !visitedLocation || !visitedDate){
+        console.log("❌ Validation failed - missing required fields");
+        return res.status(400).json({error: true, message: "Title, story, visited location, and visited date are required"})
     }
 
     // Convert visitedDate from milliseconds to Date object
     const parsedVisitedDate = new Date(parseInt(visitedDate));
+    console.log("📅 Parsed visit date:", parsedVisitedDate);
 
     try {
         const travelStory = new TravelStory({
@@ -161,13 +164,15 @@ app.post("/add-travel-story",authenticateToken, async (req, res) => {
             story,
             visitedLocation,
             userId,
-            imageUrl,
+            imageUrl: imageUrl || undefined, // Handle empty string
             visitedDate: parsedVisitedDate,
         });
 
         await travelStory.save();
-        res.status(201).json({ story: travelStory, message: 'Added Successfully' });
+        console.log("✅ Travel story saved successfully:", travelStory._id);
+        res.status(201).json({ error: false, story: travelStory, message: 'Added Successfully' });
     }   catch (error) {
+        console.error("❌ Error saving travel story:", error.message);
         res.status(400).json({ error: true, message: error.message });
     }
 })
@@ -373,13 +378,6 @@ app.get("/travel-stories/filter", authenticateToken, async (req, res) => {
         res.status(500).json({ error: true, message: error.message });
     }
 })
-
-const frontendPath = path.join(__dirname, "../frontend/travel-story-app/dist");
-app.use(express.static(frontendPath));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
 
 // Start Server
 const PORT = process.env.PORT || 5000;

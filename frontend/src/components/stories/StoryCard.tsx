@@ -1,0 +1,70 @@
+import React from 'react';
+import { Calendar, Eye } from 'lucide-react';
+import { TravelStory } from '../../types';
+
+interface StoryCardProps {
+  story: TravelStory;
+  onView?: (story: TravelStory) => void;
+}
+
+export function StoryCard({ story, onView }: StoryCardProps) {
+  return (
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+      {/* Story Image/Cover */}
+      <div className="h-48 bg-gradient-to-br from-primary-100 to-accent-100 relative overflow-hidden">
+        {story.imageUrl ? (
+          <img
+            src={story.imageUrl}
+            alt={story.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-6xl font-serif text-primary-300">
+              {story.title.charAt(0).toUpperCase()}
+            </div>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      {/* Story Content */}
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xl font-bold font-serif text-primary-800 line-clamp-1">
+            {story.title}
+          </h3>
+          <div className="flex items-center space-x-1 text-xs text-secondary-500">
+            <Calendar className="h-3 w-3" />
+            <span>{new Date(story.visitedDate).toLocaleDateString()}</span>
+          </div>
+        </div>
+
+        <div className="mb-2">
+          <span className="text-sm text-primary-600 font-medium">📍 {story.visitedLocation}</span>
+        </div>
+
+        <div className="prose prose-blue max-w-none mb-4">
+          <p className="text-secondary-600 leading-relaxed line-clamp-3 text-sm">
+            {story.story}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between pt-4 border-t border-secondary-100">
+          <div className="flex space-x-2">
+            {onView && (
+              <button
+                onClick={() => onView(story)}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-primary-500 text-white text-sm rounded-lg hover:bg-primary-600 transition-colors duration-200"
+              >
+                <Eye className="h-3 w-3" />
+                <span>Read</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
