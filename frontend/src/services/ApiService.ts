@@ -17,6 +17,7 @@ export interface User {
   _id: string;
   fullName: string;
   email: string;
+  profileImage?: string;
 }
 
 export interface AuthResponse {
@@ -75,6 +76,31 @@ class ApiService {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<{ user: User }>(response);
+  }
+
+  async updateProfileImage(imageBase64: string): Promise<{ user: User }> {
+    const response = await fetch(`${API_BASE_URL}/update-profile-image`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ profileImage: imageBase64 }),
+    });
+    return this.handleResponse<{ user: User }>(response);
+  }
+
+  // Admin endpoints
+  async getAllUsers(): Promise<{ users: User[] }> {
+    const response = await fetch(`${API_BASE_URL}/get-all-users`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ users: User[] }>(response);
+  }
+
+  async deleteSpecificUser(userId: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/delete-user/${userId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ message: string }>(response);
   }
 
   // Travel Story endpoints

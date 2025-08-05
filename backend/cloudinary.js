@@ -1,5 +1,5 @@
 const cloudinary = require('cloudinary').v2;
-require("dotenv").config();  // Only call once
+require("dotenv").config();  
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,4 +11,4 @@ cloudinary.config({
 // Debugging: Check if Cloudinary is properly configured
 console.log("Cloudinary Uploader:", cloudinary.uploader ? "Loaded ✅" : "Not Loaded ❌");
 
-module.exports = cloudinary;  // ✅ Correct way to export in CommonJS
+module.exports = cloudinary;  

@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, PenTool, Camera, MapPin, ArrowRight, Mountain, Heart } from 'lucide-react';
-import { LandingNavbar } from '../components/layout/LandingNavbar';
+import { BookOpen, PenTool, Camera, MapPin, ArrowRight, Heart, Star } from 'lucide-react';
+import { Navbar } from '../components/layout/Navbar';
 
 export function LandingPage() {
   return (
     <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50">
-      <LandingNavbar />
+      <Navbar />
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-16">
+      <section id="about-section" className="relative overflow-hidden pt-16">
         <div className="container mx-auto px-4 py-16 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <Link to="/" className="flex items-center justify-center mb-6 hover:opacity-80 transition-opacity">
@@ -30,7 +30,13 @@ export function LandingPage() {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               
-              <button className="flex items-center space-x-2 border-2 border-primary-600 text-primary-600 px-8 py-4 rounded-lg hover:bg-primary-50 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200">
+              <button 
+                onClick={() => {
+                  const element = document.getElementById('reviews-section');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="flex items-center space-x-2 border-2 border-primary-600 text-primary-600 px-8 py-4 rounded-lg hover:bg-primary-50 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200"
+              >
                 <BookOpen className="h-5 w-5" />
                 <span className="font-semibold">Explore Stories</span>
               </button>
@@ -44,7 +50,7 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section id="features-section" className="py-16 lg:py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold font-serif text-primary-800 mb-4">
@@ -93,6 +99,128 @@ export function LandingPage() {
               <p className="text-secondary-600 leading-relaxed">
                 Record where each memory was made. Keep track of all the amazing places you've visited on your journeys.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section id="reviews-section" className="py-16 lg:py-24 bg-gradient-to-br from-primary-50 to-accent-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold font-serif text-primary-800 mb-4">
+              What Our Travelers Say
+            </h2>
+            <p className="text-lg text-secondary-600">
+              Join thousands of travelers who trust TrailWhisper to preserve their precious memories
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Review 1 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow group">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="w-1 h-16 bg-gradient-to-b from-primary-400 to-primary-600 absolute left-0 top-0 rounded-full"></div>
+                <p className="text-secondary-700 mb-6 pl-6 leading-relaxed">
+                  "TrailWhisper has completely transformed how I document my travels. The interface is so intuitive, and I love how I can organize my photos and stories together. It's like having a beautiful digital scrapbook!"
+                </p>
+              </div>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  S
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-primary-800">Sarah Chen</p>
+                  <p className="text-sm text-secondary-500">Travel Blogger</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Review 2 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow group">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="w-1 h-16 bg-gradient-to-b from-accent-400 to-accent-600 absolute left-0 top-0 rounded-full"></div>
+                <p className="text-secondary-700 mb-6 pl-6 leading-relaxed">
+                  "As someone who travels frequently for work, TrailWhisper helps me capture those special moments between meetings. The mobile-friendly design means I can journal anywhere, anytime."
+                </p>
+              </div>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-accent-400 to-accent-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  M
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-primary-800">Marcus Rodriguez</p>
+                  <p className="text-sm text-secondary-500">Business Consultant</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Review 3 */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow group md:col-span-2 lg:col-span-1">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="w-1 h-16 bg-gradient-to-b from-secondary-400 to-secondary-600 absolute left-0 top-0 rounded-full"></div>
+                <p className="text-secondary-700 mb-6 pl-6 leading-relaxed">
+                  "My family and I use TrailWhisper to document our adventures together. The kids love adding their own stories and photos. It's become our digital family memory book!"
+                </p>
+              </div>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-secondary-400 to-secondary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  E
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-primary-800">Emily Johnson</p>
+                  <p className="text-sm text-secondary-500">Family Traveler</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Section */}
+          <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div className="group">
+              <div className="text-3xl lg:text-4xl font-bold text-primary-600 mb-2 group-hover:scale-110 transition-transform">
+                10K+
+              </div>
+              <p className="text-secondary-600 font-medium">Happy Travelers</p>
+            </div>
+            <div className="group">
+              <div className="text-3xl lg:text-4xl font-bold text-accent-600 mb-2 group-hover:scale-110 transition-transform">
+                50K+
+              </div>
+              <p className="text-secondary-600 font-medium">Stories Shared</p>
+            </div>
+            <div className="group">
+              <div className="text-3xl lg:text-4xl font-bold text-secondary-600 mb-2 group-hover:scale-110 transition-transform">
+                120+
+              </div>
+              <p className="text-secondary-600 font-medium">Countries Covered</p>
+            </div>
+            <div className="group">
+              <div className="text-3xl lg:text-4xl font-bold text-primary-600 mb-2 group-hover:scale-110 transition-transform">
+                4.9★
+              </div>
+              <p className="text-secondary-600 font-medium">Average Rating</p>
             </div>
           </div>
         </div>
