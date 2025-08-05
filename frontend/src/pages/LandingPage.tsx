@@ -134,10 +134,10 @@ export function LandingPage() {
               </div>
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
-                  S
+                  A
                 </div>
                 <div className="ml-3">
-                  <p className="font-semibold text-primary-800">Sarah Chen</p>
+                  <p className="font-semibold text-primary-800">Abdullah Al Mamun</p>
                   <p className="text-sm text-secondary-500">Travel Blogger</p>
                 </div>
               </div>
@@ -160,10 +160,10 @@ export function LandingPage() {
               </div>
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-accent-400 to-accent-600 rounded-full flex items-center justify-center text-white font-semibold">
-                  M
+                  K
                 </div>
                 <div className="ml-3">
-                  <p className="font-semibold text-primary-800">Marcus Rodriguez</p>
+                  <p className="font-semibold text-primary-800">Khalkin Zadid</p>
                   <p className="text-sm text-secondary-500">Business Consultant</p>
                 </div>
               </div>
@@ -186,10 +186,10 @@ export function LandingPage() {
               </div>
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-secondary-400 to-secondary-600 rounded-full flex items-center justify-center text-white font-semibold">
-                  E
+                  S
                 </div>
                 <div className="ml-3">
-                  <p className="font-semibold text-primary-800">Emily Johnson</p>
+                  <p className="font-semibold text-primary-800">Shefa Ash Shaba</p>
                   <p className="text-sm text-secondary-500">Family Traveler</p>
                 </div>
               </div>
