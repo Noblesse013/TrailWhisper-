@@ -1,5 +1,5 @@
 
-import { MapPin } from 'lucide-react';
+import logoSvg from '../../assets/logo.svg';
 
 export function Header() {
   return (
@@ -8,7 +8,11 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-primary-100 rounded-lg">
-              <MapPin className="h-6 w-6 text-primary-600" />
+              <img 
+                src={logoSvg} 
+                alt="TrailWhisper Logo" 
+                className="h-6 w-6"
+              />
             </div>
             <div>
               <span className="text-xl font-bold font-serif text-primary-800">TrailWhisper</span>

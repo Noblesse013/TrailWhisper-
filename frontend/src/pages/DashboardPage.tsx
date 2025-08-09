@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, BookOpen, Heart } from 'lucide-react';
-import { TravelStory } from '../types';
+import { TravelStory, TravelStoryImage } from '../types';
 import { StoryGrid } from '../components/stories/StoryGrid';
 import { StoryForm } from '../components/stories/StoryForm';
 import { StoryModal } from '../components/stories/StoryModal';
@@ -28,10 +28,10 @@ export function DashboardPage() {
     }
   };
 
-  const handleSaveStory = async (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string) => {
+  const handleSaveStory = async (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string, images?: TravelStoryImage[]) => {
     setFormLoading(true);
     try {
-      const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage);
+      const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images);
       setStories(prev => [newStory, ...prev]);
       setShowForm(false);
     } catch (error) {

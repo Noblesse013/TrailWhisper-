@@ -1,5 +1,5 @@
 
-import { Calendar, Eye, Heart } from 'lucide-react';
+import { Calendar, Eye, Heart, Images } from 'lucide-react';
 import { TravelStory } from '../../types';
 
 interface StoryCardProps {
@@ -9,13 +9,20 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
+  // Get the cover image (imageUrl or first image from images array)
+  const coverImage = story.imageUrl || (story.images && story.images.length > 0 ? story.images[0].url : null);
+  
+  // Check if story has multiple images
+  const hasMultipleImages = (story.images && story.images.length > 1) || 
+                           (story.images && story.images.length > 0 && story.imageUrl);
+  
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
       {/* Story Image/Cover */}
       <div className="h-48 bg-gradient-to-br from-primary-100 to-accent-100 relative overflow-hidden">
-        {story.imageUrl ? (
+        {coverImage ? (
           <img
-            src={story.imageUrl}
+            src={coverImage}
             alt={story.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -27,6 +34,14 @@ export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Multiple Images Indicator */}
+        {hasMultipleImages && (
+          <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+            <Images className="h-3 w-3" />
+            <span>{story.images?.length || 0}</span>
+          </div>
+        )}
         
         {/* Favorite Badge */}
         {story.isFavourite && (

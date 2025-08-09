@@ -1,12 +1,19 @@
 // API Service for connecting to TrailWhisper backend
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
+export interface TravelStoryImage {
+  url: string;
+  publicId: string;
+  uploadedAt: Date;
+}
+
 export interface TravelStory {
   _id: string;
   title: string;
   story: string;
   visitedLocation: string;
   imageUrl?: string;
+  images?: TravelStoryImage[];
   visitedDate: Date;
   userId: string;
   isFavourite: boolean;
@@ -135,6 +142,7 @@ class ApiService {
     story: string;
     visitedLocation: string;
     imageUrl?: string;
+    images?: TravelStoryImage[];
     visitedDate: string; // Date in milliseconds as string
   }): Promise<ApiResponse<TravelStory>> {
     const response = await fetch(`${API_BASE_URL}/add-travel-story`, {
@@ -157,6 +165,7 @@ class ApiService {
     story: string;
     visitedLocation: string;
     imageUrl?: string;
+    images?: TravelStoryImage[];
     visitedDate: string;
   }): Promise<ApiResponse<TravelStory>> {
     const response = await fetch(`${API_BASE_URL}/edit-story/${id}`, {

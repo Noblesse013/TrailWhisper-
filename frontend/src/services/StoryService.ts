@@ -1,4 +1,4 @@
-import { TravelStory } from '../types';
+import { TravelStory, TravelStoryImage } from '../types';
 import { apiService } from './ApiService';
 
 class StoryService {
@@ -7,7 +7,8 @@ class StoryService {
     content: string, 
     visitedLocation: string,
     visitedDate: Date,
-    coverImage?: string
+    coverImage?: string,
+    images?: TravelStoryImage[]
   ): Promise<TravelStory> {
     const storyData = {
       title,
@@ -15,6 +16,7 @@ class StoryService {
       visitedLocation,
       visitedDate: visitedDate.getTime().toString(),
       imageUrl: coverImage,
+      images: images || [],
     };
 
     const response = await apiService.addTravelStory(storyData);
@@ -38,6 +40,7 @@ class StoryService {
       visitedLocation?: string;
       visitedDate?: Date;
       cover_image?: string;
+      images?: TravelStoryImage[];
     }
   ): Promise<TravelStory> {
     const storyData = {
@@ -46,6 +49,7 @@ class StoryService {
       visitedLocation: updates.visitedLocation || '',
       visitedDate: updates.visitedDate?.getTime().toString() || new Date().getTime().toString(),
       imageUrl: updates.cover_image,
+      images: updates.images || [],
     };
 
     const response = await apiService.editStory(id, storyData);

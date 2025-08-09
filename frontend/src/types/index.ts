@@ -11,12 +11,19 @@ export interface Story {
 }
 
 // Backend-compatible interfaces
+export interface TravelStoryImage {
+  url: string;
+  publicId: string;
+  uploadedAt: Date;
+}
+
 export interface TravelStory {
   _id: string;
   title: string;
   story: string;
   visitedLocation: string; // Changed from array to string to match backend model
-  imageUrl?: string; // Made optional to match backend model
+  imageUrl?: string; // Made optional to match backend model (kept for backward compatibility)
+  images?: TravelStoryImage[]; // Support multiple images
   visitedDate: Date;
   userId: string;
   isFavourite: boolean;

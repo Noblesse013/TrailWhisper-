@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, UserPlus, Info, Star, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import logoSvg from '../../assets/logo.svg';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -43,6 +44,11 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <img 
+              src={logoSvg} 
+              alt="TrailWhisper Logo" 
+              className="h-10 w-10"
+            />
             <h1 className="text-xl font-bold font-serif text-primary-800">
               TrailWhisper
             </h1>
@@ -50,8 +56,8 @@ export const Navbar: React.FC = () => {
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-6">
-            {/* Main Navigation - Show only on landing page when not authenticated */}
-            {isLandingPage && !isAuthenticated && (
+            {/* Main Navigation - Show on landing page for all users */}
+            {isLandingPage && (
               <div className="hidden md:flex items-center space-x-6">
                 <button
                   onClick={() => scrollToSection('about-section')}

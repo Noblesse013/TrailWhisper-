@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, PenTool, Camera, MapPin, ArrowRight, Heart, Star } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
+import logoSvg from '../assets/logo.svg';
 
 export function LandingPage() {
   return (
@@ -11,7 +12,11 @@ export function LandingPage() {
         <div className="container mx-auto px-4 py-16 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <Link to="/" className="flex items-center justify-center mb-6 hover:opacity-80 transition-opacity">
-              
+              <img 
+                src={logoSvg} 
+                alt="TrailWhisper Logo" 
+                className="h-16 w-16 mr-4"
+              />
               <h1 className="text-5xl lg:text-7xl font-bold font-serif text-primary-800">
                 TrailWhisper
               </h1>
@@ -43,10 +48,6 @@ export function LandingPage() {
             </div>
           </div>
         </div>
-        
-        {/* Background decoration */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-accent-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-primary-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
       </section>
 
       {/* Features Section */}
@@ -253,7 +254,11 @@ export function LandingPage() {
       <footer className="bg-primary-800 py-8">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center mb-4">
-            
+            <img 
+              src={logoSvg} 
+              alt="TrailWhisper Logo" 
+              className="h-8 w-8 mr-2"
+            />
             <span className="text-lg font-serif font-bold text-white">TrailWhisper</span>
           </div>
           <p className="text-primary-300 text-sm">

@@ -1,6 +1,6 @@
-import React from 'react';
-import { X, Calendar } from 'lucide-react';
+import { X, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TravelStory } from '../../types';
+import { useState, useEffect } from 'react';
 
 interface StoryModalProps {
   story: TravelStory;
@@ -8,6 +8,43 @@ interface StoryModalProps {
 }
 
 export function StoryModal({ story, onClose }: StoryModalProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Get all images (from images array or single imageUrl for backward compatibility)
+  const allImages = story.images && story.images.length > 0 
+    ? story.images.map(img => img.url)
+    : story.imageUrl 
+    ? [story.imageUrl]
+    : [];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (allImages.length <= 1) return;
+      
+      if (event.key === 'ArrowLeft') {
+        prevImage();
+      } else if (event.key === 'ArrowRight') {
+        nextImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [allImages.length, prevImage, nextImage]);
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-slide-up">
@@ -31,13 +68,65 @@ export function StoryModal({ story, onClose }: StoryModalProps) {
         </div>
 
         <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
-          {story.imageUrl && (
-            <div className="h-64 bg-gradient-to-br from-primary-100 to-accent-100">
-              <img
-                src={story.imageUrl}
-                alt={story.title}
-                className="w-full h-full object-cover"
-              />
+          {/* Image Carousel */}
+          {allImages.length > 0 && (
+            <div className="relative bg-black">
+              {/* Main Image */}
+              <div className="relative h-96">
+                <img
+                  src={allImages[currentImageIndex]}
+                  alt={`${story.title} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Navigation Arrows - only show if more than 1 image */}
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </>
+                )}
+                
+                {/* Image Counter */}
+                {allImages.length > 1 && (
+                  <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                    {currentImageIndex + 1} / {allImages.length}
+                  </div>
+                )}
+              </div>
+              
+              {/* Thumbnail Navigation - only show if more than 1 image */}
+              {allImages.length > 1 && (
+                <div className="flex justify-center space-x-2 p-4 bg-black/90">
+                  {allImages.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToImage(index)}
+                      className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                        index === currentImageIndex 
+                          ? 'border-primary-400 opacity-100' 
+                          : 'border-transparent opacity-60 hover:opacity-80'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

@@ -3,9 +3,9 @@ const cloudinary = require("../cloudinary");
 
 // Add Travel Story
 const addTravelStory = async (req, res) => {
-    const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
+    const { title, story, visitedLocation, imageUrl, images, visitedDate } = req.body;
     const { userId } = req.user;
-    console.log("📩 Received Story Data:", { title, story, visitedLocation, imageUrl, visitedDate, userId });
+    console.log("📩 Received Story Data:", { title, story, visitedLocation, imageUrl, images, visitedDate, userId });
 
     // Validate required fields
     if (!title || !story || !visitedLocation || !visitedDate) {
@@ -23,7 +23,8 @@ const addTravelStory = async (req, res) => {
             story,
             visitedLocation,
             userId,
-            imageUrl: imageUrl || undefined, // Handle empty string
+            imageUrl: imageUrl || undefined, // Keep for backward compatibility
+            images: images || [], // Support multiple images
             visitedDate: parsedVisitedDate,
         });
 
@@ -53,7 +54,7 @@ const getAllStories = async (req, res) => {
 // Edit Travel Story
 const editStory = async (req, res) => {
     const { id } = req.params;
-    const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
+    const { title, story, visitedLocation, imageUrl, images, visitedDate } = req.body;
     const { userId } = req.user;
 
     // Validate required fields
@@ -80,6 +81,7 @@ const editStory = async (req, res) => {
         travelStory.story = story;
         travelStory.visitedLocation = visitedLocation;
         travelStory.imageUrl = imageUrl || placeholderImgUrl;
+        travelStory.images = images || []; // Support multiple images
         travelStory.visitedDate = parsedVisitedDate;
 
         await travelStory.save();
