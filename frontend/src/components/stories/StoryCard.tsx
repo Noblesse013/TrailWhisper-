@@ -1,13 +1,14 @@
-import React from 'react';
-import { Calendar, Eye } from 'lucide-react';
+
+import { Calendar, Eye, Heart } from 'lucide-react';
 import { TravelStory } from '../../types';
 
 interface StoryCardProps {
   story: TravelStory;
   onView?: (story: TravelStory) => void;
+  onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryCard({ story, onView }: StoryCardProps) {
+export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
       {/* Story Image/Cover */}
@@ -26,6 +27,13 @@ export function StoryCard({ story, onView }: StoryCardProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Favorite Badge */}
+        {story.isFavourite && (
+          <div className="absolute top-3 right-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+            <Heart className="h-4 w-4 text-white fill-current" />
+          </div>
+        )}
       </div>
 
       {/* Story Content */}
@@ -63,6 +71,22 @@ export function StoryCard({ story, onView }: StoryCardProps) {
               </button>
             )}
           </div>
+          
+          {onToggleFavorite && (
+            <button
+              onClick={() => onToggleFavorite(story)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 ${
+                story.isFavourite
+                  ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                  : 'bg-secondary-100 text-secondary-400 hover:bg-secondary-200 hover:text-red-500'
+              }`}
+              title={story.isFavourite ? 'Remove from favorites' : 'Add to favorites'}
+            >
+              <Heart 
+                className={`h-4 w-4 ${story.isFavourite ? 'fill-current' : ''}`} 
+              />
+            </button>
+          )}
         </div>
       </div>
     </div>

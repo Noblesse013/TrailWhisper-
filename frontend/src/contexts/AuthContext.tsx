@@ -7,7 +7,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (fullName: string, email: string, password: string) => Promise<void>;
+  register: (fullName: string, email: string, password: string, profileImage?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -31,21 +31,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Set a maximum time for initial loading to prevent hanging
+    const maxLoadTime = setTimeout(() => {
+      console.warn('Auth check taking too long, proceeding without auth');
+      setIsLoading(false);
+    }, 3000); // 3 seconds max
+
     // Check if user is authenticated on app load
     const checkAuth = async () => {
-      if (apiService.isAuthenticated()) {
-        try {
-          const { user } = await apiService.getUser();
-          setUser(user);
-        } catch (error) {
-          console.error('Error fetching user:', error);
-          apiService.removeToken();
-        }
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
+      if (!token) {
+        // No token found, load immediately without API call
+        clearTimeout(maxLoadTime);
+        setIsLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      // Token exists, try to get user data with timeout
+      try {
+        const { user } = await apiService.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        // Remove invalid token
+        apiService.removeToken();
+        setUser(null);
+      } finally {
+        clearTimeout(maxLoadTime);
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
+
+    return () => {
+      clearTimeout(maxLoadTime);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -64,9 +86,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (fullName: string, email: string, password: string) => {
+  const register = async (fullName: string, email: string, password: string, profileImage?: string) => {
     try {
-      const response = await apiService.createAccount(fullName, email, password);
+      const response = profileImage 
+        ? await apiService.createAccountWithImage(fullName, email, password, profileImage)
+        : await apiService.createAccount(fullName, email, password);
+      
       if (response.error) {
         throw new Error(response.message);
       }

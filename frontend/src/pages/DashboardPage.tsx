@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, BookOpen } from 'lucide-react';
+import { Plus, BookOpen, Heart } from 'lucide-react';
 import { TravelStory } from '../types';
 import { StoryGrid } from '../components/stories/StoryGrid';
 import { StoryForm } from '../components/stories/StoryForm';
 import { StoryModal } from '../components/stories/StoryModal';
+import { FavoritesSection } from '../components/stories/FavoritesSection';
 import { Navbar } from '../components/layout/Navbar';
 import { storyService } from '../services/StoryService';
 
@@ -12,6 +13,7 @@ export function DashboardPage() {
   const [showForm, setShowForm] = useState(false);
   const [viewingStory, setViewingStory] = useState<TravelStory | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
 
   useEffect(() => {
     loadStories();
@@ -36,6 +38,17 @@ export function DashboardPage() {
       console.error('Failed to save story:', error);
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  const handleToggleFavorite = async (story: TravelStory) => {
+    try {
+      const updatedStory = await storyService.toggleFavorite(story._id, !story.isFavourite);
+      setStories(prev => 
+        prev.map(s => s._id === story._id ? updatedStory : s)
+      );
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
     }
   };
 
@@ -78,20 +91,57 @@ export function DashboardPage() {
           </button>
         </div>
 
-        {/* Stories Section */}
+        {/* Stories Section with Tabs */}
         <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-primary-100 rounded-lg">
-              <BookOpen className="h-5 w-5 text-primary-600" />
+          {/* Tab Navigation */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 mb-6 border-b border-secondary-200">
+            <div className="flex space-x-4 sm:space-x-6 overflow-x-auto pb-3">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`flex items-center space-x-2 pb-3 px-1 whitespace-nowrap transition-colors duration-200 ${
+                  activeTab === 'all'
+                    ? 'border-b-2 border-primary-500 text-primary-600'
+                    : 'text-secondary-600 hover:text-primary-600'
+                }`}
+              >
+                <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="font-medium text-sm sm:text-base">
+                  All Stories ({stories.length})
+                </span>
+              </button>
+              <button
+                onClick={() => setActiveTab('favorites')}
+                className={`flex items-center space-x-2 pb-3 px-1 whitespace-nowrap transition-colors duration-200 ${
+                  activeTab === 'favorites'
+                    ? 'border-b-2 border-red-500 text-red-600'
+                    : 'text-secondary-600 hover:text-red-600'
+                }`}
+              >
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="font-medium text-sm sm:text-base">
+                  Favorites ({stories.filter(s => s.isFavourite).length})
+                </span>
+              </button>
             </div>
-            <h2 className="text-2xl font-bold font-serif text-primary-800">Your Stories</h2>
           </div>
 
-          <StoryGrid
-            stories={stories}
-            onView={handleViewStory}
-            onCreateNew={handleCreateNew}
-          />
+          {/* Tab Content */}
+          {activeTab === 'all' && (
+            <StoryGrid
+              stories={stories}
+              onView={handleViewStory}
+              onCreateNew={handleCreateNew}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          )}
+
+          {activeTab === 'favorites' && (
+            <FavoritesSection
+              stories={stories}
+              onView={handleViewStory}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          )}
         </div>
       </div>
       </div>

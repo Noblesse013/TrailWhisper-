@@ -6,6 +6,7 @@ export { StoryCard } from './stories/StoryCard';
 export { StoryForm } from './stories/StoryForm';
 export { StoryGrid } from './stories/StoryGrid';
 export { StoryModal } from './stories/StoryModal';
+export { FavoritesSection } from './stories/FavoritesSection';
 
 // Profile components
 export { ProfileImageUpload } from './profile/ProfileImageUpload';

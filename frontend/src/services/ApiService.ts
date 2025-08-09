@@ -46,10 +46,27 @@ class ApiService {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({ message: 'Network error' }));
       throw new Error(error.message || 'An error occurred');
     }
     return response.json();
+  }
+
+  private async fetchWithTimeout(url: string, options: RequestInit, timeout = 10000): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 
   // Auth endpoints
@@ -58,6 +75,15 @@ class ApiService {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fullName, email, password }),
+    });
+    return this.handleResponse<AuthResponse>(response);
+  }
+
+  async createAccountWithImage(fullName: string, email: string, password: string, profileImage?: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/create-account`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName, email, password, profileImage }),
     });
     return this.handleResponse<AuthResponse>(response);
   }
@@ -72,9 +98,9 @@ class ApiService {
   }
 
   async getUser(): Promise<{ user: User }> {
-    const response = await fetch(`${API_BASE_URL}/get-user`, {
+    const response = await this.fetchWithTimeout(`${API_BASE_URL}/get-user`, {
       headers: this.getAuthHeaders(),
-    });
+    }, 5000); // 5 second timeout for user data
     return this.handleResponse<{ user: User }>(response);
   }
 

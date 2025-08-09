@@ -1,4 +1,3 @@
-import React from 'react';
 import { BookOpen, Plus } from 'lucide-react';
 import { TravelStory } from '../../types';
 import { StoryCard } from './StoryCard';
@@ -7,9 +6,10 @@ interface StoryGridProps {
   stories: TravelStory[];
   onView?: (story: TravelStory) => void;
   onCreateNew?: () => void;
+  onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryGrid({ stories, onView, onCreateNew }: StoryGridProps) {
+export function StoryGrid({ stories, onView, onCreateNew, onToggleFavorite }: StoryGridProps) {
   if (stories.length === 0) {
     return (
       <div className="text-center py-16 animate-fade-in">
@@ -45,6 +45,7 @@ export function StoryGrid({ stories, onView, onCreateNew }: StoryGridProps) {
             key={story._id}
             story={story}
             onView={onView}
+            onToggleFavorite={onToggleFavorite}
           />
         ))}
       </div>

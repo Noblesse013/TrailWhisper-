@@ -5,7 +5,7 @@ const cloudinary = require("../cloudinary");
 
 // Create Account
 const createAccount = async (req, res) => {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, profileImage } = req.body;
 
     if (!fullName || !email || !password) {
         return res
@@ -22,10 +22,26 @@ const createAccount = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    let imageUrl = "";
+    if (profileImage) {
+        try {
+            const uploadResponse = await cloudinary.uploader.upload(profileImage, {
+                folder: "profile_images",
+            });
+            imageUrl = uploadResponse.secure_url;
+        } catch (uploadError) {
+            return res.status(500).json({
+                error: true,
+                message: "Error uploading profile image"
+            });
+        }
+    }
+
     const user = new User({
         fullName,
         email,
         password: hashedPassword,
+        profileImage: imageUrl,
     });
 
     await user.save();

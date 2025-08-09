@@ -4,22 +4,21 @@ import { LogIn, UserPlus, Info, Star, Search, User, LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Check if we're on the landing page
   const isLandingPage = location.pathname === '/';
 
-  const handleLogout = async () => {
-    try {
-      logout();
-      // Navigate to landing page immediately
-      navigate('/', { replace: true });
-    } catch (error) {
-      console.error('Logout error:', error);
-      navigate('/', { replace: true });
-    }
+  const handleLogout = () => {
+    // Don't call logout() yet - this prevents the state change that causes the flash
+    // Just clear the token and force immediate redirect
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    
+    // Force navigation to home page with full reload
+    window.location.href = '/';
   };
 
   const scrollToSection = (sectionId: string) => {
