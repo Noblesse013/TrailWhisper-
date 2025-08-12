@@ -42,7 +42,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       setDeleteLoading(userId);
       await apiService.deleteSpecificUser(userId);
-      // Remove user from local state
+      
       setUsers(users.filter(u => u._id !== userId));
     } catch (err) {
       alert('Failed to delete user. Please try again.');
@@ -133,7 +133,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Users Management */}
+        
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">

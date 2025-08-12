@@ -33,7 +33,7 @@ export function DashboardPage() {
     setFormLoading(true);
     try {
       if (editingStory) {
-        // Edit existing story
+        
         const updatedStory = await storyService.updateStory(editingStory._id, {
           title,
           content,
@@ -45,7 +45,7 @@ export function DashboardPage() {
         setStories(prev => prev.map(s => s._id === updatedStory._id ? updatedStory : s));
         setEditingStory(null);
       } else {
-        // Create new story
+        
         const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images);
         setStories(prev => [newStory, ...prev]);
       }
@@ -91,7 +91,7 @@ export function DashboardPage() {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 pt-16">
         <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 animate-fade-in">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold font-serif text-primary-800 mb-2">
@@ -113,9 +113,9 @@ export function DashboardPage() {
           </button>
         </div>
 
-        {/* Stories Section with Tabs */}
+       
         <div className="mb-8">
-          {/* Tab Navigation */}
+         
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 mb-6 border-b border-secondary-200">
             <div className="flex space-x-4 sm:space-x-6 overflow-x-auto pb-3">
               <button
@@ -147,7 +147,6 @@ export function DashboardPage() {
             </div>
           </div>
 
-          {/* Tab Content */}
           {activeTab === 'all' && (
             <StoryGrid
               stories={stories}
@@ -169,7 +168,7 @@ export function DashboardPage() {
       </div>
       </div>
       
-      {/* Modals outside the main container */}
+    
       {showForm && (
         <StoryForm
           story={editingStory}

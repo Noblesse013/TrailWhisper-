@@ -62,11 +62,11 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
         return;
       }
       
-      // Add file to the list
+      
       setImageFiles(prev => [...prev, file]);
       setUploadingImages(prev => [...prev, false]);
       
-      // Create preview
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreviews(prev => [...prev, e.target?.result as string]);
@@ -74,7 +74,7 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
       reader.readAsDataURL(file);
     });
     
-    // Clear input
+    
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -87,7 +87,7 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
     try {
       setUploadingImages(prev => prev.map((uploading, i) => i === fileIndex ? true : uploading));
       
-      // Convert file to base64
+      
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve) => {
         reader.onload = () => resolve(reader.result as string);
@@ -116,7 +116,7 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
     setImageFiles(prev => prev.filter((_, i) => i !== index));
     setUploadingImages(prev => prev.filter((_, i) => i !== index));
     
-    // Also remove from existing images if it's from the story
+    
     if (story?.images && index < story.images.length) {
       setImages(prev => prev.filter((_, i) => i !== index));
     }
@@ -127,7 +127,7 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
     if (!title.trim() || !content.trim() || !visitedLocation.trim()) return;
     
     try {
-      // Upload all new images
+      
       const newImages: TravelStoryImage[] = [];
       for (let i = 0; i < imageFiles.length; i++) {
         const uploadedImage = await handleImageUpload(i);
@@ -136,10 +136,10 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
         }
       }
       
-      // Combine existing images with new ones
+      
       const allImages = [...images, ...newImages];
       
-      // Use first image as cover image for backward compatibility
+      
       const finalCoverImage = allImages.length > 0 ? allImages[0].url : coverImage;
       
       await onSave(
@@ -252,9 +252,8 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
                   ))}
                 </div>
               )}
-              
-              {/* Add Images Button */}
-              <div 
+
+              <div
                 className="border-2 border-dashed border-secondary-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >

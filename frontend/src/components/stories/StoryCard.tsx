@@ -12,10 +12,10 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, onView, onEdit, onToggleFavorite }: StoryCardProps) {
-  // Get the cover image from the story
+  
   const coverImage = story.imageUrl || (story.images && story.images.length > 0 ? story.images[0].url : null);
   
-  // Check if story has multiple images
+  
   const hasMultipleImages = (story.images && story.images.length > 1) || 
                            (story.images && story.images.length > 0 && story.imageUrl);
   
@@ -76,7 +76,7 @@ export function StoryCard({ story, onView, onEdit, onToggleFavorite }: StoryCard
           </p>
         </div>
 
-        {/* Action Buttons */}
+        
         <div className="flex items-center justify-between pt-4 border-t border-secondary-100">
           <div className="flex space-x-2">
             {onView && (

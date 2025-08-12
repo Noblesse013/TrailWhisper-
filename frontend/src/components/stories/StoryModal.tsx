@@ -10,7 +10,7 @@ interface StoryModalProps {
 export function StoryModal({ story, onClose }: StoryModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  // Get all images (from images array or single imageUrl for backward compatibility)
+  
   const allImages = story.images && story.images.length > 0 
     ? story.images.map(img => img.url)
     : story.imageUrl 
@@ -68,7 +68,7 @@ export function StoryModal({ story, onClose }: StoryModalProps) {
         </div>
 
         <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
-          {/* Image Carousel */}
+          
           {allImages.length > 0 && (
             <div className="relative bg-black">
               {/* Main Image */}
@@ -97,7 +97,7 @@ export function StoryModal({ story, onClose }: StoryModalProps) {
                   </>
                 )}
                 
-                {/* Image Counter */}
+                
                 {allImages.length > 1 && (
                   <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                     {currentImageIndex + 1} / {allImages.length}
@@ -105,7 +105,7 @@ export function StoryModal({ story, onClose }: StoryModalProps) {
                 )}
               </div>
               
-              {/* Thumbnail Navigation - only show if more than 1 image */}
+              
               {allImages.length > 1 && (
                 <div className="flex justify-center space-x-2 p-4 bg-black/90">
                   {allImages.map((image, index) => (

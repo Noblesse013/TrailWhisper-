@@ -8,17 +8,17 @@ export const DashboardWrapper: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect admin users to admin dashboard
+    
     if (user && user.email === 'trailwhisper_admin') {
       navigate('/admin', { replace: true });
     }
   }, [user, navigate]);
 
-  // If admin user, don't render regular dashboard (will redirect)
+  
   if (user && user.email === 'trailwhisper_admin') {
     return null;
   }
 
-  // Render regular dashboard for non-admin users
+  
   return <DashboardPage />;
 };

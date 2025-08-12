@@ -198,7 +198,7 @@ export const Navbar: React.FC = () => {
 
 
 
-      {/* Edit Details Modal (now with form) */}
+      
     </nav>
   );
 };
