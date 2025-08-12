@@ -11,6 +11,7 @@ import { storyService } from '../services/StoryService';
 export function DashboardPage() {
   const [stories, setStories] = useState<TravelStory[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingStory, setEditingStory] = useState<TravelStory | null>(null);
   const [viewingStory, setViewingStory] = useState<TravelStory | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
@@ -31,8 +32,23 @@ export function DashboardPage() {
   const handleSaveStory = async (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string, images?: TravelStoryImage[]) => {
     setFormLoading(true);
     try {
-      const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images);
-      setStories(prev => [newStory, ...prev]);
+      if (editingStory) {
+        // Edit existing story
+        const updatedStory = await storyService.updateStory(editingStory._id, {
+          title,
+          content,
+          visitedLocation,
+          visitedDate,
+          cover_image: coverImage,
+          images
+        });
+        setStories(prev => prev.map(s => s._id === updatedStory._id ? updatedStory : s));
+        setEditingStory(null);
+      } else {
+        // Create new story
+        const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images);
+        setStories(prev => [newStory, ...prev]);
+      }
       setShowForm(false);
     } catch (error) {
       console.error('Failed to save story:', error);
@@ -58,6 +74,12 @@ export function DashboardPage() {
 
   const handleCloseForm = () => {
     setShowForm(false);
+    setEditingStory(null);
+  };
+
+  const handleEditStory = (story: TravelStory) => {
+    setEditingStory(story);
+    setShowForm(true);
   };
 
   const handleCreateNew = () => {
@@ -130,6 +152,7 @@ export function DashboardPage() {
             <StoryGrid
               stories={stories}
               onView={handleViewStory}
+              onEdit={handleEditStory}
               onCreateNew={handleCreateNew}
               onToggleFavorite={handleToggleFavorite}
             />
@@ -149,7 +172,7 @@ export function DashboardPage() {
       {/* Modals outside the main container */}
       {showForm && (
         <StoryForm
-          story={null}
+          story={editingStory}
           onSave={handleSaveStory}
           onClose={handleCloseForm}
           loading={formLoading}

@@ -6,7 +6,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 
-// Lazy load heavy components
+
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const DashboardWrapper = lazy(() => import('./components/DashboardWrapper').then(module => ({ default: module.DashboardWrapper })));
 

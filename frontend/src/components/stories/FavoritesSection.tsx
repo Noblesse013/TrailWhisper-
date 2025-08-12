@@ -22,7 +22,7 @@ export function FavoritesSection({ stories, onView, onToggleFavorite }: Favorite
             No Favorite Stories Yet
           </h3>
           <p className="text-secondary-600 text-sm">
-            Mark stories as favorites to see them here!
+            Mark stories as your favorites to see them here!
           </p>
         </div>
       </div>

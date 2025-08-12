@@ -2,14 +2,17 @@
 import { Calendar, Eye, Heart, Images } from 'lucide-react';
 import { TravelStory } from '../../types';
 
+import { Pencil } from 'lucide-react';
+
 interface StoryCardProps {
   story: TravelStory;
   onView?: (story: TravelStory) => void;
+  onEdit?: (story: TravelStory) => void;
   onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
-  // Get the cover image (imageUrl or first image from images array)
+export function StoryCard({ story, onView, onEdit, onToggleFavorite }: StoryCardProps) {
+  // Get the cover image from the story
   const coverImage = story.imageUrl || (story.images && story.images.length > 0 ? story.images[0].url : null);
   
   // Check if story has multiple images
@@ -18,7 +21,7 @@ export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
   
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-      {/* Story Image/Cover */}
+      
       <div className="h-48 bg-gradient-to-br from-primary-100 to-accent-100 relative overflow-hidden">
         {coverImage ? (
           <img
@@ -35,7 +38,7 @@ export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Multiple Images Indicator */}
+        
         {hasMultipleImages && (
           <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
             <Images className="h-3 w-3" />
@@ -43,7 +46,7 @@ export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
           </div>
         )}
         
-        {/* Favorite Badge */}
+        
         {story.isFavourite && (
           <div className="absolute top-3 right-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
             <Heart className="h-4 w-4 text-white fill-current" />
@@ -85,8 +88,16 @@ export function StoryCard({ story, onView, onToggleFavorite }: StoryCardProps) {
                 <span>Read</span>
               </button>
             )}
+            {onEdit && (
+              <button
+                onClick={() => onEdit(story)}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-secondary-200 text-primary-700 text-sm rounded-lg hover:bg-secondary-300 transition-colors duration-200"
+              >
+                <Pencil className="h-3 w-3" />
+                <span>Edit</span>
+              </button>
+            )}
           </div>
-          
           {onToggleFavorite && (
             <button
               onClick={() => onToggleFavorite(story)}

@@ -23,8 +23,8 @@ const addTravelStory = async (req, res) => {
             story,
             visitedLocation,
             userId,
-            imageUrl: imageUrl || undefined, // Keep for backward compatibility
-            images: images || [], // Support multiple images
+            imageUrl: imageUrl || undefined,
+            images: images || [],
             visitedDate: parsedVisitedDate,
         });
 
@@ -81,7 +81,7 @@ const editStory = async (req, res) => {
         travelStory.story = story;
         travelStory.visitedLocation = visitedLocation;
         travelStory.imageUrl = imageUrl || placeholderImgUrl;
-        travelStory.images = images || []; // Support multiple images
+        travelStory.images = images || []; 
         travelStory.visitedDate = parsedVisitedDate;
 
         await travelStory.save();

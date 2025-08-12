@@ -8,7 +8,7 @@ cloudinary.config({
     secure: true,
 });
 
-// Debugging: Check if Cloudinary is properly configured
+
 console.log("Cloudinary Uploader:", cloudinary.uploader ? "Loaded ✅" : "Not Loaded ❌");
 
 module.exports = cloudinary;  

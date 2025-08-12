@@ -171,7 +171,7 @@ const updateProfileImage = async (req, res) => {
     try {
         let imageUrl = '';
 
-        // If profileImage is provided and not empty, upload to Cloudinary
+        
         if (profileImage && profileImage.trim() !== '') {
             const result = await cloudinary.uploader.upload(profileImage, {
                 folder: "profile_images",
@@ -182,7 +182,7 @@ const updateProfileImage = async (req, res) => {
             imageUrl = result.secure_url;
         }
 
-        // Update user with new profile image URL
+        
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { profileImage: imageUrl },

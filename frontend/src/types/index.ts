@@ -1,4 +1,4 @@
-// Legacy Story interface (kept for compatibility)
+
 export interface Story {
   id: string;
   title: string;
@@ -10,7 +10,7 @@ export interface Story {
   updated_at: string;
 }
 
-// Backend-compatible interfaces
+
 export interface TravelStoryImage {
   url: string;
   publicId: string;
@@ -21,9 +21,9 @@ export interface TravelStory {
   _id: string;
   title: string;
   story: string;
-  visitedLocation: string; // Changed from array to string to match backend model
-  imageUrl?: string; // Made optional to match backend model (kept for backward compatibility)
-  images?: TravelStoryImage[]; // Support multiple images
+  visitedLocation: string; 
+  imageUrl?: string; 
+  images?: TravelStoryImage[]; 
   visitedDate: Date;
   userId: string;
   isFavourite: boolean;

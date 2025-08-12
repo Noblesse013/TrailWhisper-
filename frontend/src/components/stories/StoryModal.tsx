@@ -79,7 +79,7 @@ export function StoryModal({ story, onClose }: StoryModalProps) {
                   className="w-full h-full object-cover"
                 />
                 
-                {/* Navigation Arrows - only show if more than 1 image */}
+                
                 {allImages.length > 1 && (
                   <>
                     <button

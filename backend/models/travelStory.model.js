@@ -8,12 +8,12 @@ const travelStorySchema = new Schema({
     isFavourite: { type: Boolean, default: false },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true},
     createdOn: { type: Date, default: Date.now },
-    imageUrl: { type: String, required: false }, // Keep for backward compatibility
+    imageUrl: { type: String, required: false }, 
     images: [{ 
         url: { type: String, required: true },
         publicId: { type: String, required: true },
         uploadedAt: { type: Date, default: Date.now }
-    }], // Support multiple images
+    }], 
     visitedDate: { type: Date, required: true }, 
 });
 

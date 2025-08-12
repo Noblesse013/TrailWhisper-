@@ -10,7 +10,7 @@ export const ProfileImageUpload: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Update local state when user prop changes
+  
   useEffect(() => {
     setProfileImage(user?.profileImage || '');
   }, [user?.profileImage]);
@@ -22,13 +22,13 @@ export const ProfileImageUpload: React.FC = () => {
     setError('');
     setSuccess('');
 
-    // Check file size (max 5MB)
+    
     if (file.size > 5 * 1024 * 1024) {
       setError('Image size should be less than 5MB');
       return;
     }
 
-    // Check file type
+    
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
       return;
@@ -37,7 +37,7 @@ export const ProfileImageUpload: React.FC = () => {
     setIsUploading(true);
 
     try {
-      // Convert file to base64
+      
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Image = e.target?.result as string;

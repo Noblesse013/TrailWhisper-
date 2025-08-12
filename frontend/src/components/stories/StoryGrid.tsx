@@ -5,11 +5,12 @@ import { StoryCard } from './StoryCard';
 interface StoryGridProps {
   stories: TravelStory[];
   onView?: (story: TravelStory) => void;
+  onEdit?: (story: TravelStory) => void;
   onCreateNew?: () => void;
   onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryGrid({ stories, onView, onCreateNew, onToggleFavorite }: StoryGridProps) {
+export function StoryGrid({ stories, onView, onEdit, onCreateNew, onToggleFavorite }: StoryGridProps) {
   if (stories.length === 0) {
     return (
       <div className="text-center py-16 animate-fade-in">
@@ -45,6 +46,7 @@ export function StoryGrid({ stories, onView, onCreateNew, onToggleFavorite }: St
             key={story._id}
             story={story}
             onView={onView}
+            onEdit={onEdit}
             onToggleFavorite={onToggleFavorite}
           />
         ))}
