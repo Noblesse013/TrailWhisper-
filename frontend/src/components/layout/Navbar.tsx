@@ -1,19 +1,41 @@
-import React from 'react';
+
+import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, UserPlus, Info, Star, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import logoSvg from '../../assets/logo.svg';
 
+
 export const Navbar: React.FC = () => {
+
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
   
-  // Check if we're on the landing page
   const isLandingPage = location.pathname === '/';
 
+  
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileCard(false);
+      }
+    }
+    if (showProfileCard) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileCard]);
+
   const handleLogout = () => {
-    // Call logout function from AuthContext
+    
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     
@@ -21,16 +43,16 @@ export const Navbar: React.FC = () => {
   };
 
   const scrollToSection = (sectionId: string) => {
-    // If not on landing page, navigate to landing page first
+    
     if (!isLandingPage) {
       navigate('/');
-      // Wait for navigation then scroll
+      
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         element?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else {
-      // Already on landing page, just scroll
+      
       const element = document.getElementById(sectionId);
       element?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -83,35 +105,71 @@ export const Navbar: React.FC = () => {
               </div>
             )}
 
-            {/* Auth Buttons */}
+            
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
-                /* Authenticated User Menu */
+              
                 <>
-                  <div className="flex items-center space-x-2 text-secondary-600">
+                  <div className="flex items-center space-x-2 text-secondary-600 relative" ref={profileRef}>
                     {user?.profileImage ? (
                       <img 
                         src={user.profileImage} 
                         alt={user.fullName} 
                         className="h-8 w-8 rounded-full object-cover border-2 border-primary-200 cursor-pointer hover:border-primary-400 transition-colors"
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => setShowProfileCard((v) => !v)}
                       />
                     ) : (
                       <User 
                         className="h-4 w-4 cursor-pointer hover:text-primary-600 transition-colors" 
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => setShowProfileCard((v) => !v)}
                       />
                     )}
                     <span className="text-sm font-medium">{user?.fullName}</span>
+
+                    
+                    {showProfileCard && (
+                      <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-secondary-200 z-50 p-4 animate-fade-in">
+                        <div className="flex flex-col items-center mb-3">
+                          {user?.profileImage ? (
+                            <img src={user.profileImage} alt={user.fullName} className="h-16 w-16 rounded-full object-cover border-2 border-primary-200 mb-2" />
+                          ) : (
+                            <div className="h-16 w-16 rounded-full bg-secondary-100 flex items-center justify-center mb-2">
+                              <User className="h-8 w-8 text-secondary-400" />
+                            </div>
+                          )}
+                          <div className="text-lg font-bold text-primary-800">{user?.fullName}</div>
+                          <div className="text-sm text-secondary-600 mb-2">{user?.email}</div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (location.pathname === '/dashboard') {
+                              navigate('/');
+                            } else {
+                              navigate('/dashboard');
+                            }
+                            setShowProfileCard(false);
+                          }}
+                          className="w-full flex items-center justify-center space-x-2 px-4 py-2 mb-2 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors duration-200"
+                        >
+                          <User className="h-4 w-4" />
+                          <span>{location.pathname === '/dashboard' ? 'Go to Homepage' : 'Go to Dashboard'}</span>
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center justify-center space-x-2 px-4 py-2 mb-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Logout</span>
+                        </button>
+                        <button
+                          onClick={() => setShowProfileCard(false)}
+                          className="w-full px-4 py-2 text-sm text-secondary-600 hover:bg-secondary-50 rounded-lg transition-colors duration-200"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </button>
                 </>
               ) : (
                
@@ -137,6 +195,12 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
+
+
+
+      {/* Edit Details Modal (now with form) */}
     </nav>
   );
 };
+
+
