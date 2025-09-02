@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, PenTool, Camera, MapPin, ArrowRight, Heart, Star } from 'lucide-react';
+import { BookOpen, PenTool, Camera, MapPin, ArrowRight, Heart, Star, MessageCircle } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import logoSvg from '../assets/logo.svg';
 
@@ -7,7 +7,7 @@ export function LandingPage() {
   return (
     <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50">
       <Navbar />
-      {/* Hero Section */}
+      
       <section id="about-section" className="relative overflow-hidden pt-16">
         <div className="container mx-auto px-4 py-16 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
@@ -50,7 +50,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      
       <section id="features-section" className="py-16 lg:py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -62,7 +62,7 @@ export function LandingPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {/* Feature 1 */}
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-6 group-hover:bg-primary-200 transition-colors">
@@ -101,11 +101,26 @@ export function LandingPage() {
                 Record where each memory was made. Keep track of all the amazing places you've visited on your journeys.
               </p>
             </div>
+
+            {/* Feature 4 - Whispy */}
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mb-6 group-hover:bg-gradient-to-br group-hover:from-purple-200 group-hover:to-pink-200 transition-all">
+                <MessageCircle className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-bold font-serif text-primary-800 mb-3">
+                Meet Whispy
+              </h3>
+              <p className="text-secondary-600 leading-relaxed">
+                Your AI travel buddy! Get personalized destination recommendations, travel tips, and planning assistance.
+                <span className="block mt-2 text-sm font-semibold text-purple-600">
+                  FREE for first 100 members! 🎉
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Reviews Section */}
       <section id="reviews-section" className="py-16 lg:py-24 bg-gradient-to-br from-primary-50 to-accent-50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">

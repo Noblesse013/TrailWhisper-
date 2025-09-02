@@ -142,7 +142,9 @@ export const Navbar: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            if (location.pathname === '/dashboard') {
+                            if (location.pathname === '/' && user?.email === 'trailwhisper_admin') {
+                              navigate('/admin');
+                            } else if (location.pathname === '/admin' || location.pathname === '/dashboard') {
                               navigate('/');
                             } else {
                               navigate('/dashboard');
@@ -152,7 +154,13 @@ export const Navbar: React.FC = () => {
                           className="w-full flex items-center justify-center space-x-2 px-4 py-2 mb-2 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors duration-200"
                         >
                           <User className="h-4 w-4" />
-                          <span>{location.pathname === '/dashboard' ? 'Go to Homepage' : 'Go to Dashboard'}</span>
+                          <span>
+                            {location.pathname === '/' && user?.email === 'trailwhisper_admin' 
+                              ? 'Go to Dashboard' 
+                              : location.pathname === '/admin' || location.pathname === '/dashboard'
+                              ? 'Go to Landing Page'
+                              : 'Go to Dashboard'}
+                          </span>
                         </button>
                         <button
                           onClick={handleLogout}

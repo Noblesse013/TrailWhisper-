@@ -10,7 +10,6 @@ export interface Story {
   updated_at: string;
 }
 
-
 export interface TravelStoryImage {
   url: string;
   publicId: string;
@@ -28,6 +27,33 @@ export interface TravelStory {
   userId: string;
   isFavourite: boolean;
   createdOn: Date;
+}
+
+// Wishlist interfaces
+export interface WishlistItem {
+  _id: string;
+  destination: string;
+  description?: string;
+  plannedDate?: Date;
+  priority: 'Low' | 'Medium' | 'High';
+  estimatedBudget?: number;
+  notes?: string;
+  imageUrl?: string;
+  userId: string;
+  createdOn: Date;
+  updatedOn: Date;
+}
+
+// Favorite interfaces
+export interface Favorite {
+  _id: string;
+  itemType: 'TravelStory' | 'Destination';
+  itemId: string;
+  userId: string;
+  createdOn: Date;
+  notes?: string;
+  tags?: string[];
+  item?: any; // The actual favorited item (TravelStory, etc.)
 }
 
 export interface User {

@@ -5,6 +5,7 @@ import { StoryGrid } from '../components/stories/StoryGrid';
 import { StoryForm } from '../components/stories/StoryForm';
 import { StoryModal } from '../components/stories/StoryModal';
 import { FavoritesSection } from '../components/stories/FavoritesSection';
+import { WishlistSection } from '../components/wishlist/WishlistSection';
 import { Navbar } from '../components/layout/Navbar';
 import { storyService } from '../services/StoryService';
 
@@ -14,7 +15,7 @@ export function DashboardPage() {
   const [editingStory, setEditingStory] = useState<TravelStory | null>(null);
   const [viewingStory, setViewingStory] = useState<TravelStory | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'favorites' | 'wishlist'>('all');
 
   useEffect(() => {
     loadStories();
@@ -144,6 +145,18 @@ export function DashboardPage() {
                   Favorites ({stories.filter(s => s.isFavourite).length})
                 </span>
               </button>
+              <button
+                onClick={() => setActiveTab('wishlist')}
+                className={`flex items-center space-x-2 pb-3 px-1 whitespace-nowrap transition-colors duration-200 ${
+                  activeTab === 'wishlist'
+                    ? 'border-b-2 border-primary-500 text-primary-600'
+                    : 'text-secondary-600 hover:text-primary-600'
+                }`}
+              >
+                <span className="font-medium text-sm sm:text-base">
+                  Wishlist
+                </span>
+              </button>
             </div>
           </div>
 
@@ -163,6 +176,10 @@ export function DashboardPage() {
               onView={handleViewStory}
               onToggleFavorite={handleToggleFavorite}
             />
+          )}
+
+          {activeTab === 'wishlist' && (
+            <WishlistSection />
           )}
         </div>
       </div>

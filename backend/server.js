@@ -47,12 +47,18 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const travelStoryRoutes = require("./routes/travelStoryRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const chatbotRoutes = require('./routes/chatbotRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 
 // Use Routes
 app.use("/", userRoutes);           // User authentication routes
 app.use("/", adminRoutes);          // Admin management routes
 app.use("/", travelStoryRoutes);    // Travel story CRUD routes
 app.use("/", imageRoutes);          // Image upload/delete routes
+app.use('/api/chatbot', chatbotRoutes); // Chatbot interaction routes
+app.use("/", wishlistRoutes);       // Wishlist management routes
+app.use("/", favoriteRoutes);       // Favorite management routes
 
 // Start Server
 const PORT = process.env.PORT || 5000;
