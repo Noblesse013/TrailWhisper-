@@ -32,7 +32,16 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: "50mb" }));  // Increase JSON body size limit
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(cors()); // Allow all origins for development
+
+app.use(cors(
+  {
+    origin: process.env.CLIENT_URL || "https://trail-whisper-delta.vercel.app/", // Adjust as necessary
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }
+
+
+)); 
 
 // Serve static files from assets directory
 app.use("/assets", express.static(path.join(__dirname, "uploads")));
