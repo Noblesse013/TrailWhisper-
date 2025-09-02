@@ -5,14 +5,17 @@ const {
     createAccount,
     login,
     getUser,
-    updateProfileImage
+    updateProfileImage,
+    getUserCount
 } = require("../controllers/userController");
 
 
 router.post("/create-account", createAccount);
 router.post("/login", login);
 
-// Protected routes
+router.get("/api/users/count", getUserCount);
+
+
 router.get("/get-user", authenticateToken, getUser);
 router.put("/update-profile-image", authenticateToken, updateProfileImage);
 

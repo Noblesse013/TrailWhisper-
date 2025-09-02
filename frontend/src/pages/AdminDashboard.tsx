@@ -90,11 +90,6 @@ export const AdminDashboard: React.FC = () => {
                 <h1 className="text-3xl font-bold font-serif text-primary-800">Admin Dashboard</h1>
               </div>
             </div>
-            
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary-600">{users.filter(u => u.email !== 'trailwhisper_admin').length}</div>
-              <div className="text-sm text-secondary-500">Regular Users</div>
-            </div>
           </div>
         </div>
 

@@ -70,13 +70,17 @@ const createAccount = async (req, res) => {
 // Login
 const login = async (req, res) => {
     const { email, password } = req.body;
+    
+    console.log("Login attempt:", { email, passwordLength: password?.length });
 
     if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required!" });
+        console.log(" Missing credentials");
+        return res.status(400).json({ error: true, message: "Email and password are required!" });
     }
 
     // Check for hardcoded admin credentials
     if (email === 'trailwhisper_admin' && password === 'trailwhisper1234') {
+        console.log(" Admin login successful");
         const accessToken = jwt.sign(
             { userId: 'admin', isAdmin: true },
             process.env.ACCESS_TOKEN_SECRET,
@@ -100,12 +104,14 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(400).json({ message: "User not found" });
+        console.log("User not found:", email);
+        return res.status(400).json({ error: true, message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid credentials" });
+        console.log("Invalid password for:", email);
+        return res.status(400).json({ error: true, message: "Invalid credentials" });
     }
 
     const accessToken = jwt.sign(
@@ -116,6 +122,7 @@ const login = async (req, res) => {
         }
     );
 
+    console.log("Login successful for:", email);
     return res.json({
         error: false,
         message: "Login Successful",
@@ -209,9 +216,21 @@ const updateProfileImage = async (req, res) => {
     }
 };
 
+
+const getUserCount = async (req, res) => {
+    try {
+        const count = await User.countDocuments();
+        return res.json({ count });
+    } catch (error) {
+        console.error(" Error getting user count:", error);
+        return res.status(500).json({ error: true, message: "Failed to get user count" });
+    }
+};
+
 module.exports = {
     createAccount,
     login,
     getUser,
-    updateProfileImage
+    updateProfileImage,
+    getUserCount
 };
