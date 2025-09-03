@@ -6,11 +6,12 @@ interface StoryGridProps {
   stories: TravelStory[];
   onView?: (story: TravelStory) => void;
   onEdit?: (story: TravelStory) => void;
+  onDelete?: (story: TravelStory) => void;
   onCreateNew?: () => void;
   onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryGrid({ stories, onView, onEdit, onCreateNew, onToggleFavorite }: StoryGridProps) {
+export function StoryGrid({ stories, onView, onEdit, onDelete, onCreateNew, onToggleFavorite }: StoryGridProps) {
   if (stories.length === 0) {
     return (
       <div className="text-center py-16 animate-fade-in">
@@ -47,6 +48,7 @@ export function StoryGrid({ stories, onView, onEdit, onCreateNew, onToggleFavori
             story={story}
             onView={onView}
             onEdit={onEdit}
+            onDelete={onDelete}
             onToggleFavorite={onToggleFavorite}
           />
         ))}

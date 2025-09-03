@@ -30,6 +30,62 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// Get User Statistics (Admin only) - includes story counts
+const getUserStats = async (req, res) => {
+    const { userId, isAdmin } = req.user;
+
+    try {
+        // Check if the user is the hardcoded admin
+        if (!isAdmin || userId !== 'admin') {
+            return res.status(403).json({ error: true, message: "Access denied. Admin privileges required." });
+        }
+
+        // Get all users except admin with their story counts
+        const allUsers = await User.find({ email: { $ne: 'trailwhisper_admin' } }).select('-password').sort({ createnOn: -1 });
+        
+        // Get story counts for each user
+        const usersWithStats = await Promise.all(
+            allUsers.map(async (user) => {
+                const storyCount = await TravelStory.countDocuments({ userId: user._id });
+                const favoriteStoryCount = await TravelStory.countDocuments({ 
+                    userId: user._id, 
+                    isFavourite: true 
+                });
+                
+                return {
+                    _id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    profileImage: user.profileImage,
+                    createnOn: user.createnOn,
+                    storyCount,
+                    favoriteStoryCount
+                };
+            })
+        );
+
+        // Calculate total statistics 
+        const totalStories = usersWithStats.reduce((sum, user) => sum + user.storyCount, 0);
+        const totalFavorites = usersWithStats.reduce((sum, user) => sum + user.favoriteStoryCount, 0);
+        const activeUsers = usersWithStats.filter(user => user.storyCount > 0).length;
+
+        return res.json({
+            users: usersWithStats,
+            statistics: {
+                totalUsers: usersWithStats.length,
+                activeUsers,
+                totalStories,
+                totalFavorites,
+                averageStoriesPerUser: usersWithStats.length > 0 ? (totalStories / usersWithStats.length).toFixed(1) : 0
+            }
+        });
+
+    } catch (error) {
+        console.error("❌ Error fetching user statistics:", error);
+        return res.status(500).json({ error: true, message: error.message });
+    }
+};
+
 // Delete User (Admin only)
 const deleteUser = async (req, res) => {
     const { userId: adminUserId, isAdmin } = req.user;
@@ -41,10 +97,6 @@ const deleteUser = async (req, res) => {
             return res.status(403).json({ error: true, message: "Access denied. Admin privileges required." });
         }
 
-        // Prevent admin from deleting admin account
-        if (userId === 'admin') {
-            return res.status(400).json({ error: true, message: "Cannot delete admin account." });
-        }
 
         // Check if user exists
         const userToDelete = await User.findById(userId);
@@ -68,5 +120,6 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
     getAllUsers,
+    getUserStats,
     deleteUser
 };

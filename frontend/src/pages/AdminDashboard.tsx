@@ -1,34 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navbar } from '../components/layout/Navbar';
-import { Users, Trash2, Mail, Calendar, User as UserIcon, Shield, AlertTriangle } from 'lucide-react';
-import { apiService } from '../services/ApiService';
-import { User } from '../types';
+import { Users, Trash2, Mail, Calendar, User as UserIcon, Shield, AlertTriangle, BookOpen, Heart, BarChart3 } from 'lucide-react';
+import { apiService, UserWithStats, UserStatistics } from '../services/ApiService';
 
-interface AdminUser extends User {
+interface AdminUser extends UserWithStats {
   createnOn: string;
 }
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [statistics, setStatistics] = useState<UserStatistics['statistics'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAllUsers();
+    fetchUserStats();
   }, []);
 
-  const fetchAllUsers = async () => {
+  const fetchUserStats = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiService.getAllUsers();
+      const response = await apiService.getUserStats();
       setUsers(response.users as AdminUser[]);
+      setStatistics(response.statistics);
     } catch (err) {
-      setError('Failed to load users. Please try again.');
-      console.error('Error fetching users:', err);
+      setError('Failed to load user statistics. Please try again.');
+      console.error('Error fetching user stats:', err);
     } finally {
       setLoading(false);
     }
@@ -44,6 +45,8 @@ export const AdminDashboard: React.FC = () => {
       await apiService.deleteSpecificUser(userId);
       
       setUsers(users.filter(u => u._id !== userId));
+      // Refresh stats after deletion
+      await fetchUserStats();
     } catch (err) {
       alert('Failed to delete user. Please try again.');
       console.error('Error deleting user:', err);
@@ -93,13 +96,13 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Enhanced Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-secondary-500 mb-1">Total Users</p>
-                <p className="text-2xl font-bold text-primary-800">{users.length}</p>
+                <p className="text-2xl font-bold text-primary-800">{statistics?.totalUsers || 0}</p>
               </div>
               <Users className="h-8 w-8 text-primary-600" />
             </div>
@@ -108,22 +111,40 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-secondary-500 mb-1">Regular Users</p>
-                <p className="text-2xl font-bold text-primary-800">
-                  {users.filter(u => u.email !== 'trailwhisper_admin').length}
-                </p>
+                <p className="text-sm text-secondary-500 mb-1">Active Users</p>
+                <p className="text-2xl font-bold text-green-600">{statistics?.activeUsers || 0}</p>
               </div>
-              <UserIcon className="h-8 w-8 text-primary-600" />
+              <UserIcon className="h-8 w-8 text-green-600" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-secondary-500 mb-1">Admin Status</p>
-                <p className="text-lg font-bold text-green-600">Active</p>
+                <p className="text-sm text-secondary-500 mb-1">Total Stories</p>
+                <p className="text-2xl font-bold text-blue-600">{statistics?.totalStories || 0}</p>
               </div>
-              <Shield className="h-8 w-8 text-green-600" />
+              <BookOpen className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-secondary-500 mb-1">Favorites</p>
+                <p className="text-2xl font-bold text-pink-600">{statistics?.totalFavorites || 0}</p>
+              </div>
+              <Heart className="h-8 w-8 text-pink-600" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-secondary-500 mb-1">Avg Stories/User</p>
+                <p className="text-2xl font-bold text-purple-600">{statistics?.averageStoriesPerUser || 0}</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-purple-600" />
             </div>
           </div>
         </div>
@@ -138,7 +159,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
               
               <button
-                onClick={fetchAllUsers}
+                onClick={fetchUserStats}
                 disabled={loading}
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
@@ -171,6 +192,8 @@ export const AdminDashboard: React.FC = () => {
                       <th className="text-left py-3 px-4 font-semibold text-primary-800">User</th>
                       <th className="text-left py-3 px-4 font-semibold text-primary-800">Email</th>
                       <th className="text-left py-3 px-4 font-semibold text-primary-800">Joined</th>
+                      <th className="text-left py-3 px-4 font-semibold text-primary-800">Stories</th>
+                      <th className="text-left py-3 px-4 font-semibold text-primary-800">Favorites</th>
                       <th className="text-left py-3 px-4 font-semibold text-primary-800">Actions</th>
                     </tr>
                   </thead>
@@ -205,6 +228,18 @@ export const AdminDashboard: React.FC = () => {
                           <div className="flex items-center space-x-2 text-secondary-600">
                             <Calendar className="h-4 w-4" />
                             <span>{formatDate(userData.createnOn)}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-2">
+                            <BookOpen className="h-4 w-4 text-blue-600" />
+                            <span className="font-medium text-blue-600">{userData.storyCount}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-2">
+                            <Heart className="h-4 w-4 text-pink-600" />
+                            <span className="font-medium text-pink-600">{userData.favoriteStoryCount}</span>
                           </div>
                         </td>
                         <td className="py-4 px-4">
