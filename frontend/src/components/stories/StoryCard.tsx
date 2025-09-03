@@ -1,5 +1,5 @@
 
-import { Calendar, Eye, Heart, Images } from 'lucide-react';
+import { Calendar, Eye, Heart, Images, Trash2 } from 'lucide-react';
 import { TravelStory } from '../../types';
 
 import { Pencil } from 'lucide-react';
@@ -8,10 +8,11 @@ interface StoryCardProps {
   story: TravelStory;
   onView?: (story: TravelStory) => void;
   onEdit?: (story: TravelStory) => void;
+  onDelete?: (story: TravelStory) => void;
   onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function StoryCard({ story, onView, onEdit, onToggleFavorite }: StoryCardProps) {
+export function StoryCard({ story, onView, onEdit, onDelete, onToggleFavorite }: StoryCardProps) {
   
   const coverImage = story.imageUrl || (story.images && story.images.length > 0 ? story.images[0].url : null);
   
@@ -95,6 +96,15 @@ export function StoryCard({ story, onView, onEdit, onToggleFavorite }: StoryCard
               >
                 <Pencil className="h-3 w-3" />
                 <span>Edit</span>
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(story)}
+                className="flex items-center space-x-1 px-3 py-1.5 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                <Trash2 className="h-3 w-3" />
+                <span>Delete</span>
               </button>
             )}
           </div>

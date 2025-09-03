@@ -5,10 +5,11 @@ import { Heart } from 'lucide-react';
 interface FavoritesSectionProps {
   stories: TravelStory[];
   onView?: (story: TravelStory) => void;
+  onDelete?: (story: TravelStory) => void;
   onToggleFavorite?: (story: TravelStory) => void;
 }
 
-export function FavoritesSection({ stories, onView, onToggleFavorite }: FavoritesSectionProps) {
+export function FavoritesSection({ stories, onView, onDelete, onToggleFavorite }: FavoritesSectionProps) {
   const favoriteStories = stories.filter(story => story.isFavourite);
 
   if (favoriteStories.length === 0) {
@@ -45,6 +46,7 @@ export function FavoritesSection({ stories, onView, onToggleFavorite }: Favorite
               key={story._id}
               story={story}
               onView={onView}
+              onDelete={onDelete}
               onToggleFavorite={onToggleFavorite}
             />
           ))}

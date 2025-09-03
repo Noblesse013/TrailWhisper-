@@ -26,6 +26,23 @@ export interface User {
   profileImage?: string;
 }
 
+export interface UserWithStats extends User {
+  createnOn: string;
+  storyCount: number;
+  favoriteStoryCount: number;
+}
+
+export interface UserStatistics {
+  users: UserWithStats[];
+  statistics: {
+    totalUsers: number;
+    activeUsers: number;
+    totalStories: number;
+    totalFavorites: number;
+    averageStoriesPerUser: string;
+  };
+}
+
 export interface AuthResponse {
   error: boolean;
   message: string;
@@ -125,6 +142,13 @@ class ApiService {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<{ users: User[] }>(response);
+  }
+
+  async getUserStats(): Promise<UserStatistics> {
+    const response = await fetch(`${API_BASE_URL}/get-user-stats`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<UserStatistics>(response);
   }
 
   async deleteSpecificUser(userId: string): Promise<{ message: string }> {

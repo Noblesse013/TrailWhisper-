@@ -69,6 +69,20 @@ export function DashboardPage() {
     }
   };
 
+  const handleDeleteStory = async (story: TravelStory) => {
+    if (!window.confirm(`Are you sure you want to delete "${story.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await storyService.deleteStory(story._id);
+      setStories(prev => prev.filter(s => s._id !== story._id));
+    } catch (error) {
+      console.error('Failed to delete story:', error);
+      alert('Failed to delete story. Please try again.');
+    }
+  };
+
   const handleViewStory = (story: TravelStory) => {
     setViewingStory(story);
   };
@@ -167,6 +181,7 @@ export function DashboardPage() {
               onEdit={handleEditStory}
               onCreateNew={handleCreateNew}
               onToggleFavorite={handleToggleFavorite}
+              onDelete={handleDeleteStory}
             />
           )}
 
@@ -174,6 +189,7 @@ export function DashboardPage() {
             <FavoritesSection
               stories={stories}
               onView={handleViewStory}
+              onDelete={handleDeleteStory}
               onToggleFavorite={handleToggleFavorite}
             />
           )}
