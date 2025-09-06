@@ -112,9 +112,6 @@ export function LandingPage() {
               </h3>
               <p className="text-secondary-600 leading-relaxed">
                 Your AI travel buddy! Get personalized destination recommendations, travel tips, and planning assistance.
-                <span className="block mt-2 text-sm font-semibold text-purple-600">
-                  FREE for first 100 members! 🎉
-                </span>
               </p>
             </div>
           </div>
