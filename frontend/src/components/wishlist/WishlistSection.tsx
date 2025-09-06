@@ -219,7 +219,7 @@ export const WishlistSection: React.FC = () => {
             <div className="flex items-center">
               <Calendar className="h-8 w-8 text-blue-600" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-blue-600">Upcoming (6 months)</p>
+                <p className="text-sm font-medium text-blue-600">Upcoming</p>
                 <p className="text-2xl font-bold text-blue-800">{stats.upcomingTrips}</p>
               </div>
             </div>

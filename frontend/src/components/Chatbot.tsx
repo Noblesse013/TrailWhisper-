@@ -49,9 +49,6 @@ const Chatbot: React.FC = () => {
               <p className="text-gray-600 text-sm leading-relaxed">
                 Hi there! I'm Whispy, your AI travel buddy. To chat with me, you'll need to sign up or log in to TrailWhisper.
               </p>
-              <div className="mt-4 space-y-2">
-                <p className="text-purple-600 font-semibold text-sm">🎉 Free for first 100 members!</p>
-              </div>
             </div>
           </div>
         </div>
