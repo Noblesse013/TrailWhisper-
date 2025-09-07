@@ -3,7 +3,7 @@ const cloudinary = require("../cloudinary");
 
 // Add Travel Story
 const addTravelStory = async (req, res) => {
-    const { title, story, visitedLocation, imageUrl, images, visitedDate } = req.body;
+    const { title, story, visitedLocation, imageUrl, images, visitedDate, locationTags } = req.body;
     const { userId } = req.user;
     console.log("📩 Received Story Data:", { title, story, visitedLocation, imageUrl, images, visitedDate, userId });
 
@@ -26,6 +26,7 @@ const addTravelStory = async (req, res) => {
             imageUrl: imageUrl || undefined,
             images: images || [],
             visitedDate: parsedVisitedDate,
+            locationTags: Array.isArray(locationTags) ? locationTags : [],
         });
 
         await travelStory.save();
@@ -54,7 +55,7 @@ const getAllStories = async (req, res) => {
 // Edit Travel Story
 const editStory = async (req, res) => {
     const { id } = req.params;
-    const { title, story, visitedLocation, imageUrl, images, visitedDate } = req.body;
+    const { title, story, visitedLocation, imageUrl, images, visitedDate, locationTags } = req.body;
     const { userId } = req.user;
 
     // Validate required fields
@@ -83,6 +84,7 @@ const editStory = async (req, res) => {
         travelStory.imageUrl = imageUrl || placeholderImgUrl;
         travelStory.images = images || []; 
         travelStory.visitedDate = parsedVisitedDate;
+        travelStory.locationTags = Array.isArray(locationTags) ? locationTags : [];
 
         await travelStory.save();
         res.status(200).json({ story: travelStory, message: 'Update Successful' });
@@ -164,6 +166,7 @@ const searchStories = async (req, res) => {
                 { title: { $regex: query, $options: "i" } },
                 { story: { $regex: query, $options: "i" } },
                 { visitedLocation: { $regex: query, $options: "i" } },
+                { locationTags: { $elemMatch: { $regex: query, $options: "i" } } },
             ],
         }).sort({ isFavourite: -1 });
 
@@ -195,6 +198,49 @@ const filterStoriesByDate = async (req, res) => {
     }
 };
 
+// Advanced combined search: query + optional date range + tags
+const advancedSearch = async (req, res) => {
+    const { query, startDate, endDate, tags } = req.query;
+    const { userId } = req.user;
+
+    try {
+        const filter = { userId };
+
+        // Date range
+        if (startDate && endDate) {
+            const start = new Date(parseInt(startDate));
+            const end = new Date(parseInt(endDate));
+            filter.visitedDate = { $gte: start, $lte: end };
+        }
+
+        // Tags (comma-separated)
+        if (typeof tags === 'string' && tags.trim().length > 0) {
+            const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+            if (tagList.length > 0) {
+                filter.locationTags = { $all: tagList };
+            }
+        }
+
+        // Text query across title, story, visitedLocation, and tags
+        const textConditions = [];
+        if (query && query.trim().length > 0) {
+            textConditions.push(
+                { title: { $regex: query, $options: "i" } },
+                { story: { $regex: query, $options: "i" } },
+                { visitedLocation: { $regex: query, $options: "i" } },
+                { locationTags: { $elemMatch: { $regex: query, $options: "i" } } }
+            );
+        }
+
+        const finalFilter = textConditions.length > 0 ? { ...filter, $or: textConditions } : filter;
+
+        const stories = await TravelStory.find(finalFilter).sort({ isFavourite: -1 });
+        res.status(200).json({ stories });
+    } catch (error) {
+        res.status(500).json({ error: true, message: error.message });
+    }
+};
+
 module.exports = {
     addTravelStory,
     getAllStories,
@@ -202,5 +248,6 @@ module.exports = {
     deleteStory,
     updateFavouriteStatus,
     searchStories,
-    filterStoriesByDate
+    filterStoriesByDate,
+    advancedSearch
 };

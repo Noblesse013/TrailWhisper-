@@ -11,6 +11,7 @@ export interface TravelStory {
   title: string;
   story: string;
   visitedLocation: string;
+  locationTags?: string[];
   imageUrl?: string;
   images?: TravelStoryImage[];
   visitedDate: Date;
@@ -164,6 +165,7 @@ class ApiService {
     title: string;
     story: string;
     visitedLocation: string;
+    locationTags?: string[];
     imageUrl?: string;
     images?: TravelStoryImage[];
     visitedDate: string; // Date in milliseconds as string
@@ -187,6 +189,7 @@ class ApiService {
     title: string;
     story: string;
     visitedLocation: string;
+    locationTags?: string[];
     imageUrl?: string;
     images?: TravelStoryImage[];
     visitedDate: string;
@@ -230,6 +233,17 @@ class ApiService {
     const response = await fetch(`${API_BASE_URL}/travel-stories/filter?startDate=${start}&endDate=${end}`, {
       headers: this.getAuthHeaders(),
     });
+    return this.handleResponse<{ stories: TravelStory[] }>(response);
+  }
+
+  async advancedSearch(params: { query?: string; startDate?: Date; endDate?: Date; tags?: string[] }): Promise<{ stories: TravelStory[] }> {
+    const q = params.query ? `query=${encodeURIComponent(params.query)}` : '';
+    const s = params.startDate ? `startDate=${params.startDate.getTime()}` : '';
+    const e = params.endDate ? `endDate=${params.endDate.getTime()}` : '';
+    const t = params.tags && params.tags.length > 0 ? `tags=${encodeURIComponent(params.tags.join(','))}` : '';
+    const parts = [q, s, e, t].filter(Boolean).join('&');
+    const url = parts.length > 0 ? `${API_BASE_URL}/travel-stories/advanced-search?${parts}` : `${API_BASE_URL}/travel-stories/advanced-search`;
+    const response = await fetch(url, { headers: this.getAuthHeaders() });
     return this.handleResponse<{ stories: TravelStory[] }>(response);
   }
 

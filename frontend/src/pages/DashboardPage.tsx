@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, BookOpen, Heart } from 'lucide-react';
 import { TravelStory, TravelStoryImage } from '../types';
 import { StoryGrid } from '../components/stories/StoryGrid';
@@ -16,6 +16,22 @@ export function DashboardPage() {
   const [viewingStory, setViewingStory] = useState<TravelStory | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'favorites' | 'wishlist'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDateSuggestions, setShowDateSuggestions] = useState(false);
+  const uniqueVisitedDates = useMemo(() => {
+    const labels: string[] = [];
+    const seen = new Set<string>();
+    for (const s of stories) {
+      const d = new Date(s.visitedDate);
+      const label = `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+      if (!seen.has(label)) {
+        seen.add(label);
+        labels.push(label);
+      }
+    }
+    return labels;
+  }, [stories]);
+  
 
   useEffect(() => {
     loadStories();
@@ -30,7 +46,48 @@ export function DashboardPage() {
     }
   };
 
-  const handleSaveStory = async (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string, images?: TravelStoryImage[]) => {
+  const parseUsDate = (value: string): Date | null => {
+    const match = value.trim().match(/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s*$/);
+    if (!match) return null;
+    const month = parseInt(match[1], 10);
+    const day = parseInt(match[2], 10);
+    const year = parseInt(match[3], 10);
+    const d = new Date(year, month - 1, day);
+    if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+    return d;
+  };
+
+  const runAdvancedSearch = async () => {
+    try {
+      const trimmed = searchQuery.trim();
+      if (!trimmed) {
+        await loadStories();
+        return;
+      }
+      const dateCandidate = parseUsDate(trimmed);
+      if (dateCandidate) {
+        const start = new Date(dateCandidate.getFullYear(), dateCandidate.getMonth(), dateCandidate.getDate(), 0, 0, 0, 0);
+        const end = new Date(dateCandidate.getFullYear(), dateCandidate.getMonth(), dateCandidate.getDate(), 23, 59, 59, 999);
+        const results = await storyService.filterStoriesByDate(start, end);
+        setStories(results);
+        return;
+      }
+      const results = await storyService.searchStories(trimmed);
+      setStories(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+  };
+
+  // Unified search handles date; keep helper for onChange triggers if needed
+
+  const handleReset = async () => {
+    setSearchQuery('');
+    setShowDateSuggestions(false);
+    await loadStories();
+  };
+
+  const handleSaveStory = async (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string, images?: TravelStoryImage[], locationTags?: string[]) => {
     setFormLoading(true);
     try {
       if (editingStory) {
@@ -41,13 +98,14 @@ export function DashboardPage() {
           visitedLocation,
           visitedDate,
           cover_image: coverImage,
-          images
+          images,
+          locationTags
         });
         setStories(prev => prev.map(s => s._id === updatedStory._id ? updatedStory : s));
         setEditingStory(null);
       } else {
         
-        const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images);
+        const newStory = await storyService.createStory(title, content, visitedLocation, visitedDate, coverImage, images, locationTags);
         setStories(prev => [newStory, ...prev]);
       }
       setShowForm(false);
@@ -106,7 +164,49 @@ export function DashboardPage() {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 pt-16">
         <div className="container mx-auto px-4 py-8">
-        
+        {/* Search */}
+        <div className="mb-6 flex items-start gap-3">
+          <div className="flex-1 relative">
+            <div className="flex bg-white rounded-xl border border-secondary-300 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary-500">
+              <input
+                type="text"
+                value={searchQuery}
+                onFocus={() => setShowDateSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowDateSuggestions(false), 150)}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') runAdvancedSearch(); }}
+                placeholder="Search by title, content, location, tag, or date (M/D/YYYY)"
+                className="flex-1 px-4 py-3 outline-none"
+              />
+              <button onClick={runAdvancedSearch} className="px-6 bg-primary-500 text-white hover:bg-primary-600">Search</button>
+            </div>
+            {showDateSuggestions && (
+              <div className="absolute z-50 mt-1 w-full bg-white border border-secondary-200 rounded-lg shadow-lg max-h-56 overflow-auto">
+                {uniqueVisitedDates
+                  .filter(label => {
+                    const q = searchQuery.trim().toLowerCase();
+                    return q.length === 0 || label.toLowerCase().includes(q);
+                  })
+                  .slice(0, 8)
+                  .map(label => (
+                    <button
+                      type="button"
+                      key={label}
+                      onClick={() => { setSearchQuery(label); setShowDateSuggestions(false); setTimeout(() => runAdvancedSearch(), 0); }}
+                      className="w-full text-left px-4 py-2 hover:bg-secondary-50"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                {uniqueVisitedDates.length === 0 && (
+                  <div className="px-4 py-2 text-secondary-500 text-sm">No dates available</div>
+                )}
+              </div>
+            )}
+          </div>
+          <button onClick={handleReset} className="px-4 py-3 text-secondary-700 hover:bg-secondary-100 rounded-lg">Reset</button>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 animate-fade-in">
           <div className="mb-4 sm:mb-0">
             <h1 className="text-3xl font-bold font-serif text-primary-800 mb-2">

@@ -8,12 +8,14 @@ class StoryService {
     visitedLocation: string,
     visitedDate: Date,
     coverImage?: string,
-    images?: TravelStoryImage[]
+    images?: TravelStoryImage[],
+    locationTags?: string[]
   ): Promise<TravelStory> {
     const storyData = {
       title,
       story: content,
       visitedLocation,
+      locationTags: locationTags || [],
       visitedDate: visitedDate.getTime().toString(),
       imageUrl: coverImage,
       images: images || [],
@@ -41,12 +43,14 @@ class StoryService {
       visitedDate?: Date;
       cover_image?: string;
       images?: TravelStoryImage[];
+      locationTags?: string[];
     }
   ): Promise<TravelStory> {
     const storyData = {
       title: updates.title || '',
       story: updates.content || '',
       visitedLocation: updates.visitedLocation || '',
+      locationTags: updates.locationTags || [],
       visitedDate: updates.visitedDate?.getTime().toString() || new Date().getTime().toString(),
       imageUrl: updates.cover_image,
       images: updates.images || [],
@@ -75,6 +79,11 @@ class StoryService {
 
   async searchStories(query: string): Promise<TravelStory[]> {
     const response = await apiService.searchStories(query);
+    return response.stories;
+  }
+
+  async advancedSearch(params: { query?: string; startDate?: Date; endDate?: Date; tags?: string[] }): Promise<TravelStory[]> {
+    const response = await apiService.advancedSearch(params);
     return response.stories;
   }
 
