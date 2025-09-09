@@ -7,12 +7,16 @@ interface FavoritesSectionProps {
   onView?: (story: TravelStory) => void;
   onDelete?: (story: TravelStory) => void;
   onToggleFavorite?: (story: TravelStory) => void;
+  didSearch?: boolean;
 }
 
-export function FavoritesSection({ stories, onView, onDelete, onToggleFavorite }: FavoritesSectionProps) {
+export function FavoritesSection({ stories, onView, onDelete, onToggleFavorite, didSearch = false }: FavoritesSectionProps) {
   const favoriteStories = stories.filter(story => story.isFavourite);
 
   if (favoriteStories.length === 0) {
+    if (didSearch) {
+      return <div className="text-center py-12 text-secondary-600">No matching favorites found.</div>;
+    }
     return (
       <div className="text-center py-12 animate-fade-in">
         <div className="bg-white rounded-2xl p-8 max-w-md mx-auto shadow-lg">

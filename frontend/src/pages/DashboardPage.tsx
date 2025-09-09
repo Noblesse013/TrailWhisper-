@@ -18,6 +18,7 @@ export function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'favorites' | 'wishlist'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDateSuggestions, setShowDateSuggestions] = useState(false);
+  const [didSearch, setDidSearch] = useState(false);
   const uniqueVisitedDates = useMemo(() => {
     const labels: string[] = [];
     const seen = new Set<string>();
@@ -41,6 +42,7 @@ export function DashboardPage() {
     try {
       const loadedStories = await storyService.getStories();
       setStories(loadedStories);
+      setDidSearch(false);
     } catch (error) {
       console.error('Failed to load stories:', error);
     }
@@ -70,10 +72,12 @@ export function DashboardPage() {
         const end = new Date(dateCandidate.getFullYear(), dateCandidate.getMonth(), dateCandidate.getDate(), 23, 59, 59, 999);
         const results = await storyService.filterStoriesByDate(start, end);
         setStories(results);
+        setDidSearch(true);
         return;
       }
       const results = await storyService.searchStories(trimmed);
       setStories(results);
+      setDidSearch(true);
     } catch (error) {
       console.error('Search failed:', error);
     }
@@ -84,6 +88,7 @@ export function DashboardPage() {
   const handleReset = async () => {
     setSearchQuery('');
     setShowDateSuggestions(false);
+    setDidSearch(false);
     await loadStories();
   };
 
@@ -212,12 +217,13 @@ export function DashboardPage() {
             <h1 className="text-3xl font-bold font-serif text-primary-800 mb-2">
               Welcome to TrailWhisper!
             </h1>
-            <p className="text-secondary-600">
-              {stories.length === 0 
-                ? 'Ready to share your first story?' 
-                : `You have ${stories.length} ${stories.length === 1 ? 'story' : 'stories'} to share`
-              }
-            </p>
+            {!didSearch || stories.length > 0 ? (
+              <p className="text-secondary-600">
+                {stories.length === 0 
+                  ? 'Ready to share your first story?' 
+                  : `You have ${stories.length} ${stories.length === 1 ? 'story' : 'stories'} to share`}
+              </p>
+            ) : null}
           </div>
           <button
             onClick={handleCreateNew}
@@ -275,14 +281,18 @@ export function DashboardPage() {
           </div>
 
           {activeTab === 'all' && (
-            <StoryGrid
-              stories={stories}
-              onView={handleViewStory}
-              onEdit={handleEditStory}
-              onCreateNew={handleCreateNew}
-              onToggleFavorite={handleToggleFavorite}
-              onDelete={handleDeleteStory}
-            />
+            stories.length === 0 && didSearch ? (
+              <div className="text-center py-16 text-secondary-600">No matching stories found.</div>
+            ) : (
+              <StoryGrid
+                stories={stories}
+                onView={handleViewStory}
+                onEdit={handleEditStory}
+                onCreateNew={handleCreateNew}
+                onToggleFavorite={handleToggleFavorite}
+                onDelete={handleDeleteStory}
+              />
+            )
           )}
 
           {activeTab === 'favorites' && (
@@ -291,6 +301,7 @@ export function DashboardPage() {
               onView={handleViewStory}
               onDelete={handleDeleteStory}
               onToggleFavorite={handleToggleFavorite}
+              didSearch={didSearch}
             />
           )}
 
