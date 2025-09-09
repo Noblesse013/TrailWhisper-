@@ -8,7 +8,8 @@ const {
     deleteStory,
     updateFavouriteStatus,
     searchStories,
-    filterStoriesByDate
+    filterStoriesByDate,
+    advancedSearch
 } = require("../controllers/travelStoryController");
 
 router.post("/add-travel-story", authenticateToken, addTravelStory);
@@ -18,5 +19,6 @@ router.delete("/delete-story/:id", authenticateToken, deleteStory);
 router.put("/update-is-favourite/:id", authenticateToken, updateFavouriteStatus);
 router.get("/search", authenticateToken, searchStories);
 router.get("/travel-stories/filter", authenticateToken, filterStoriesByDate);
+router.get("/travel-stories/advanced-search", authenticateToken, advancedSearch);
 
 module.exports = router;

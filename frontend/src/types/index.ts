@@ -21,6 +21,7 @@ export interface TravelStory {
   title: string;
   story: string;
   visitedLocation: string; 
+  locationTags?: string[];
   imageUrl?: string; 
   images?: TravelStoryImage[]; 
   visitedDate: Date;

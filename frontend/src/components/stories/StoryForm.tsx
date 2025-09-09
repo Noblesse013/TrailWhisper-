@@ -5,7 +5,15 @@ import { apiService } from '../../services/ApiService';
 
 interface StoryFormProps {
   story?: TravelStory | null;
-  onSave: (title: string, content: string, visitedLocation: string, visitedDate: Date, coverImage?: string, images?: TravelStoryImage[]) => Promise<void>;
+  onSave: (
+    title: string,
+    content: string,
+    visitedLocation: string,
+    visitedDate: Date,
+    coverImage?: string,
+    images?: TravelStoryImage[],
+    locationTags?: string[]
+  ) => Promise<void>;
   onClose: () => void;
   loading?: boolean;
 }
@@ -23,6 +31,8 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [locationTags, setLocationTags] = useState<string[]>(story?.locationTags || []);
+  const [tagInput, setTagInput] = useState<string>("");
 
   useEffect(() => {
     if (story) {
@@ -32,6 +42,9 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
       setVisitedDate(story.visitedDate ? new Date(story.visitedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
       setCoverImage(story.imageUrl || '');
       setImages(story.images || []);
+      setLocationTags((story.locationTags && story.locationTags.length > 0)
+        ? story.locationTags
+        : (story.visitedLocation ? story.visitedLocation.split(',').map(s => s.trim()).filter(Boolean) : []));
       
       // Initialize previews with existing images
       const existingPreviews = story.images?.map(img => img.url) || [];
@@ -50,6 +63,8 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
       setImagePreviews([]);
       setImageFiles([]);
       setUploadingImages([]);
+      setLocationTags([]);
+      setTagInput("");
     }
   }, [story]);
 
@@ -124,7 +139,11 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim() || !visitedLocation.trim()) return;
+    if (!title.trim() || !content.trim()) return;
+    if (locationTags.length === 0 && !visitedLocation.trim()) {
+      alert('Please add at least one location tag.');
+      return;
+    }
     
     try {
       
@@ -141,18 +160,35 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
       
       
       const finalCoverImage = allImages.length > 0 ? allImages[0].url : coverImage;
+      const derivedVisitedLocation = (locationTags.length > 0 ? locationTags.join(', ') : visitedLocation).trim();
       
       await onSave(
         title.trim(), 
         content.trim(), 
-        visitedLocation.trim(), 
+        derivedVisitedLocation, 
         new Date(visitedDate), 
         finalCoverImage,
-        allImages
+        allImages,
+        locationTags
       );
     } catch (error) {
       console.error('Error saving story:', error);
     }
+  };
+
+  const addTag = () => {
+    const value = tagInput.trim();
+    if (!value) return;
+    if (locationTags.includes(value)) {
+      setTagInput("");
+      return;
+    }
+    setLocationTags(prev => [...prev, value]);
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    setLocationTags(prev => prev.filter(t => t !== tag));
   };
 
   return (
@@ -186,20 +222,8 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
             />
           </div>
 
-          <div>
-            <label htmlFor="visitedLocation" className="block text-sm font-medium text-secondary-700 mb-2">
-              Visited Location *
-            </label>
-            <input
-              id="visitedLocation"
-              type="text"
-              value={visitedLocation}
-              onChange={(e) => setVisitedLocation(e.target.value)}
-              className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-              placeholder="Where did you travel?"
-              required
-            />
-          </div>
+          {/* Visited Location now comes from tags. Keep hidden for form validity if needed */}
+          <input type="hidden" value={visitedLocation} readOnly />
 
           <div>
             <label htmlFor="visitedDate" className="block text-sm font-medium text-secondary-700 mb-2">
@@ -213,6 +237,35 @@ export function StoryForm({ story, onSave, onClose, loading = false }: StoryForm
               className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-secondary-700 mb-2">
+              Location Tags
+            </label>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {locationTags.map((tag) => (
+                <span key={tag} className="inline-flex items-center bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm border border-primary-200">
+                  {tag}
+                  <button type="button" onClick={() => removeTag(tag)} className="ml-2 text-primary-600 hover:text-primary-800">
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                className="flex-1 px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                placeholder="Add a tag and press Enter"
+              />
+              <button type="button" onClick={addTag} className="px-4 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                Add
+              </button>
+            </div>
           </div>
 
           <div>
